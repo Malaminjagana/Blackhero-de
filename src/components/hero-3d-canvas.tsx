@@ -1,8 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef } from "react";
+import { Component, Suspense, useEffect, useMemo, useRef, useState, type ErrorInfo, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, useTexture } from "@react-three/drei";
+import { assetPath } from "@/lib/asset-path";
+import { Hero3DFallback } from "@/components/hero-3d-error-boundary";
 import {
   CanvasTexture,
   Group,
@@ -15,9 +17,38 @@ import {
   SRGBColorSpace
 } from "three";
 
-const MODEL_PATH = "/models/desktop_pc/scene.gltf";
-const BANNER_PATH = "/images/black-heroes-banner.webp";
+const MODEL_PATH = assetPath("/models/desktop_pc/scene.gltf");
+const BANNER_PATH = assetPath("/images/black-heroes-banner.webp");
 const ROTATION_SPEED = 0.18;
+
+type ModelErrorBoundaryProps = {
+  children: ReactNode;
+  onError: () => void;
+};
+
+type ModelErrorBoundaryState = {
+  hasError: boolean;
+};
+
+class ModelErrorBoundary extends Component<
+  ModelErrorBoundaryProps,
+  ModelErrorBoundaryState
+> {
+  state: ModelErrorBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(): ModelErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("The Black Heroes 3D model failed to load.", error, errorInfo);
+    this.props.onError();
+  }
+
+  render() {
+    return this.state.hasError ? null : this.props.children;
+  }
+}
 
 function createFittedBannerTexture(image: HTMLImageElement, anisotropy: number) {
   const width = 1024;
@@ -165,30 +196,37 @@ function Workstation() {
 }
 
 export default function Hero3DCanvas() {
+  const [hasModelError, setHasModelError] = useState(false);
+
   return (
-    <Canvas
-      className="h-full w-full"
-      frameloop="always"
-      shadows="percentage"
-      dpr={[1, 1.5]}
-      camera={{ position: [20, 3, 5], fov: 25 }}
-      gl={{ antialias: true, powerPreference: "low-power" }}
-      style={{ touchAction: "pan-y" }}
-      fallback={
-        <div className="grid h-full place-items-center px-6 text-center text-sm text-white/70">
-          Die 3D-Ansicht wird von diesem Gerät nicht unterstützt.
-        </div>
-      }
-    >
-      <Suspense fallback={null}>
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          minPolarAngle={Math.PI / 2}
-          maxPolarAngle={Math.PI / 2}
-        />
-        <Workstation />
-      </Suspense>
-    </Canvas>
+    <div className="relative h-full w-full">
+      <Canvas
+        className="h-full w-full"
+        frameloop="always"
+        shadows="percentage"
+        dpr={[1, 1.5]}
+        camera={{ position: [20, 3, 5], fov: 25 }}
+        gl={{ antialias: true, powerPreference: "low-power" }}
+        style={{ touchAction: "pan-y" }}
+        fallback={
+          <div className="grid h-full place-items-center px-6 text-center text-sm text-white/70">
+            Die 3D-Ansicht wird von diesem Gerät nicht unterstützt.
+          </div>
+        }
+      >
+        <ModelErrorBoundary onError={() => setHasModelError(true)}>
+          <Suspense fallback={null}>
+            <OrbitControls
+              enableZoom={false}
+              enablePan={false}
+              minPolarAngle={Math.PI / 2}
+              maxPolarAngle={Math.PI / 2}
+            />
+            <Workstation />
+          </Suspense>
+        </ModelErrorBoundary>
+      </Canvas>
+      {hasModelError && <Hero3DFallback />}
+    </div>
   );
 }

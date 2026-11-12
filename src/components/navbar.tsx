@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
+import { assetPath } from "@/lib/asset-path";
 
 const links = [
   ["Über uns", "#ueber-uns"],
@@ -19,7 +20,7 @@ export function Navbar() {
       <div className="container flex h-[82px] items-center justify-between">
         <Link href="/" className="flex h-full shrink-0 items-center" aria-label="Black Heroes Startseite">
           <Image
-            src="/images/black-heroes-logo-transparent.webp"
+            src={assetPath("/images/black-heroes-logo-transparent.webp")}
             alt="Black Heroes Security"
             width={1680}
             height={1504}

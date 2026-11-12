@@ -5,11 +5,8 @@ const nextConfig: NextConfig = {
   // Generate a static website for GitHub Pages
   output: "export",
 
-  // GitHub project repository path
-  // Only apply the prefix during GitHub Actions deployment
-  basePath: process.env.GITHUB_ACTIONS
-    ? "/Blackhero-de"
-    : "",
+  // Set NEXT_PUBLIC_BASE_PATH only for deployments hosted below a repository path.
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH ?? "",
 
   // Required for static image hosting with next/image
   images: {

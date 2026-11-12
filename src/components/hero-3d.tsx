@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { assetPath } from "@/lib/asset-path";
+import { Hero3DErrorBoundary } from "@/components/hero-3d-error-boundary";
 
 const WorkstationCanvas = dynamic(() => import("@/components/hero-3d-canvas"), {
   ssr: false,
@@ -108,7 +110,9 @@ export function Hero3D() {
         role="img"
         aria-label="Interactive 3D workstation. Drag to rotate it; zoom is disabled."
       >
-        <WorkstationCanvas />
+        <Hero3DErrorBoundary>
+          <WorkstationCanvas />
+        </Hero3DErrorBoundary>
       </div>
 
       <div className="container relative z-10 flex min-h-[800px] items-center py-20 sm:min-h-[740px] lg:min-h-[690px]">
@@ -116,7 +120,7 @@ export function Hero3D() {
           <div className="mb-7 w-fit">
             <div className="mb-4 flex items-center justify-center gap-2">
               <Image
-                src="/images/dekra-din-77200-1.avif"
+                src={assetPath("/images/dekra-din-77200-1.avif")}
                 alt="DEKRA Sicherungsdienstleistungen DIN 77200-1"
                 width={256}
                 height={478}
@@ -124,7 +128,7 @@ export function Hero3D() {
                 className="h-11 w-auto object-contain"
               />
               <Image
-                src="/images/dekra-iso-9001.avif"
+                src={assetPath("/images/dekra-iso-9001.avif")}
                 alt="DEKRA Qualitätsmanagement ISO 9001"
                 width={256}
                 height={354}

@@ -6,6 +6,7 @@ import {
 import Image from "next/image";
 import { Hero3D } from "@/components/hero-3d";
 import { TestimonialCarousel } from "@/components/testimonial-carousel";
+import { assetPath } from "@/lib/asset-path";
 
 const services = [
   { icon: Building2, title: "Objektschutz", text: "Zuverlässige Präsenz und strukturierte Kontrollgänge zum Schutz von Gebäuden, Anlagen und Sachwerten.", image: "/images/service-objektschutz.jpg" },
@@ -59,7 +60,7 @@ export default function HomePage() {
           <div>
             <div className="relative min-h-[430px] overflow-hidden">
               <Image
-                src="/images/about-black-heroes.webp"
+                src={assetPath("/images/about-black-heroes.webp")}
                 alt="Das Team von Black Heroes Security"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -220,7 +221,7 @@ export default function HomePage() {
             <article className="group rounded-2xl border border-[#c6a052]/20 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[#c6a052]/50 hover:shadow-[0_18px_45px_rgba(0,0,0,.1)] motion-reduce:transition-none sm:p-6">
               <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#f0e9da] ring-1 ring-[#c6a052]/20">
                 <Image
-                  src="/images/M_traore.webp"
+                  src={assetPath("/images/M_traore.webp")}
                   alt="Mousa Traoré, Geschäftsführer von Black Heroes Security"
                   fill
                   sizes="(max-width: 767px) 100vw, 50vw"
@@ -236,7 +237,7 @@ export default function HomePage() {
             <article className="group rounded-2xl border border-[#c6a052]/20 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[#c6a052]/50 hover:shadow-[0_18px_45px_rgba(0,0,0,.1)] motion-reduce:transition-none sm:p-6">
               <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#f0e9da] ring-1 ring-[#c6a052]/20">
                 <Image
-                  src="/images/M_jagana.webp"
+                  src={assetPath("/images/M_jagana.webp")}
                   alt="Malamin Jagana, Verantwortlicher für Qualitätsmanagement"
                   fill
                   sizes="(max-width: 767px) 100vw, 50vw"
