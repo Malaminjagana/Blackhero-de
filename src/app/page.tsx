@@ -1,7 +1,8 @@
 import {
   ArrowRight, ShieldCheck, Building2, CalendarDays, Eye, Users,
   BadgeCheck, Clock3, MapPin, Phone, CheckCircle2, ChevronDown,
-  Award, Shield, GraduationCap, Crown, Mail
+  Award, Shield, GraduationCap, Crown, Mail, Globe2, Languages,
+  HeartHandshake, Handshake
 } from "lucide-react";
 import Image from "next/image";
 import { Hero3D } from "@/components/hero-3d";
@@ -40,6 +41,14 @@ const qualifications = [
   { icon: Crown, title: "Angehender Meister für Schutz und Sicherheit (MFSS)", text: "In Vorbereitung" }
 ];
 
+const teamValues = [
+  { icon: ShieldCheck, title: "Zuverlässigkeit", text: "Wir halten unsere Zusagen und nehmen unsere Verantwortung ernst." },
+  { icon: HeartHandshake, title: "Respekt", text: "Wir begegnen Kunden, Mitarbeitern und Besuchern respektvoll und auf Augenhöhe." },
+  { icon: Eye, title: "Professionalität", text: "Wir handeln aufmerksam, verantwortungsbewusst und situationsgerecht." },
+  { icon: Users, title: "Teamarbeit", text: "Wir arbeiten gemeinsam und unterstützen uns gegenseitig." },
+  { icon: Handshake, title: "Vertrauen", text: "Wir schaffen durch transparente Kommunikation und zuverlässige Arbeit eine vertrauensvolle Zusammenarbeit." }
+];
+
 function SectionHeading({ label, title, copy, light = false }: { label: string; title: string; copy: string; light?: boolean }) {
   return <div className="mb-12">
     <div className="eyebrow">{label}</div>
@@ -53,65 +62,118 @@ export default function HomePage() {
     <main>
       <Hero3D />
 
-      <section id="ueber-uns" className="section">
-        
-
-        <div className="container grid items-center gap-14 lg:grid-cols-2">
-          <div>
-            <div className="relative min-h-[430px] overflow-hidden">
+      <section id="ueber-uns" className="section scroll-mt-20">
+        <div className="container">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
+            <div className="group relative min-h-[340px] overflow-hidden bg-[#202020] sm:min-h-[460px]">
               <Image
                 src={assetPath("/images/about-black-heroes.webp")}
                 alt="Das Team von Black Heroes Security"
                 fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
+                sizes="(max-width: 1023px) 100vw, 52vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.02] motion-reduce:transition-none"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" aria-hidden="true" />
+              <div className="absolute bottom-5 left-5 right-5 flex items-center gap-3 border border-white/15 bg-[#171717]/85 p-4 text-white backdrop-blur-sm sm:bottom-7 sm:left-7 sm:right-7">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#c6a052]/35 bg-[#c6a052]/10 text-[#dfc58e]">
+                  <Globe2 size={21} aria-hidden="true" />
+                </span>
+                <span>
+                  <span className="block text-sm font-bold sm:text-base">Sicherheit mit Vertrauen, Vielfalt und Verantwortung</span>
+                  <span className="mt-1 block text-xs text-white/70">Gemeinsam aufmerksam. Gemeinsam verlässlich.</span>
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <div className="eyebrow">Über Black Heroes</div>
+              <h2 className="section-title">Sicherheit mit Vertrauen, Vielfalt und Verantwortung.</h2>
+              <p className="section-copy">
+                Black Heroes Security ist ein professionelles Sicherheitsunternehmen in Deutschland. Unser internationales und multikulturelles Team vereint Menschen mit afrikanischen und afroamerikanischen Wurzeln sowie weiteren internationalen und kulturellen Hintergründen.
+              </p>
+              <p className="section-copy mt-4">
+                Unterschiedliche Erfahrungen und Perspektiven bringen neue Blickwinkel in unsere tägliche Arbeit. Wir sehen Vielfalt, gegenseitigen Respekt, Professionalität und Teamarbeit als wichtige Stärken für einen aufmerksamen Umgang mit Menschen und verlässliche Sicherheitsleistungen.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <span className="inline-flex items-center gap-2 border border-[#c6a052]/35 bg-white/70 px-4 py-2.5 text-sm font-semibold">
+                  <ShieldCheck size={17} className="text-[#96702f]" aria-hidden="true" />
+                  Professioneller Sicherheitsdienst
+                </span>
+                <span className="inline-flex items-center gap-2 border border-[#c6a052]/35 bg-white/70 px-4 py-2.5 text-sm font-semibold">
+                  <MapPin size={17} className="text-[#96702f]" aria-hidden="true" />
+                  Berlin &amp; Brandenburg
+                </span>
+              </div>
+              <a href="#kontakt" className="mt-7 inline-flex items-center gap-2 font-extrabold text-[#96702f]">
+                Lernen Sie uns kennen <ArrowRight size={17} aria-hidden="true" />
+              </a>
             </div>
           </div>
-          <div className="lg:col-span-2">
-            <section aria-labelledby="qualifications-heading" className="border border-[#c6a052]/25 bg-[#171717] px-6 py-8 text-white sm:px-8 sm:py-10">
-              <div className="mb-8 max-w-2xl">
-               
-                <h2 id="qualifications-heading" className="section-title !mb-4 text-white">Qualifikationen unserer Mitarbeiter</h2>
-            
+
+          <section aria-labelledby="international-team-heading" className="mt-20 border-y border-[var(--line)] py-10 sm:mt-24 sm:py-12">
+            <div className="grid gap-8 md:grid-cols-[.8fr_1.2fr] md:items-center md:gap-12">
+              <div>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center border border-[#c6a052]/35 bg-[#c6a052]/10 text-[#96702f]">
+                  <Languages size={23} aria-hidden="true" />
+                </div>
+                <h3 id="international-team-heading" className="max-w-md text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl">
+                  Ein internationales Team mit gemeinsamen Werten
+                </h3>
               </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {qualifications.map(({ icon: Icon, title, text }) => (
-                  <article key={title} className="group min-h-44 border border-white/10 bg-white/[0.03] p-5 transition duration-300 hover:-translate-y-1 hover:border-[#c6a052]/60 hover:bg-white/[0.06] motion-reduce:transition-none">
-                    <div className="mb-5 flex h-11 w-11 items-center justify-center border border-[#c6a052]/30 bg-[#c6a052]/10 text-[#c6a052] transition-colors group-hover:bg-[#c6a052]/15">
-                      <Icon size={21} aria-hidden="true" />
-                    </div>
-                    <h3 className="text-base font-bold leading-snug text-[#dfc58e]">{title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-white/70">{text}</p>
-                  </article>
-                ))}
+              <div>
+                <p className="max-w-2xl text-sm leading-7 text-[#66635d] sm:text-base">
+                  In unserem Team sind verschiedene Sprachkenntnisse vertreten. Mehrsprachige Kommunikation hilft uns, professionell mit Kunden, Besuchern, Mitarbeitern und Menschen unterschiedlicher Hintergründe zu sprechen und auf ihre Anliegen einzugehen.
+                </p>
+                <ul aria-label="Im Team vertretene Sprachen" className="mt-6 flex flex-wrap gap-2.5">
+                  {["Deutsch", "Englisch", "Französisch", "Arabisch", "Türkisch"].map((language) => (
+                    <li key={language} className="inline-flex items-center gap-2 border border-[#202020]/10 bg-white px-4 py-2.5 text-sm font-bold shadow-sm">
+                      <Globe2 size={15} className="text-[#96702f]" aria-hidden="true" />
+                      {language}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </section>
-          </div>
-          <div className="relative -mx-4 mt-14 flex flex-wrap gap-x-8 gap-y-4 border-t border-white/20 bg-[#0a0a0a]/90 px-4 pt-7 text-sm text-white/85 sm:mx-0 sm:bg-transparent sm:px-0">
-            <span className="flex items-center gap-2 rounded-full border border-[#c6a052]/30 bg-[#0a0a0f] px-4 py-2 text-sm font-medium text-white shadow-[0_0_20px_rgba(198,160,82,0.15)]">
-    <ShieldCheck size={17} className="text-[#c6a052]" />
-    Professioneller Sicherheitsdienst
-  </span>
-  <span className="flex items-center gap-2 rounded-full border border-[#c6a052]/30 bg-[#0a0a0f] px-4 py-2 text-sm font-medium text-white shadow-[0_0_20px_rgba(198,160,82,0.15)]">
-    <MapPin size={17} className="text-[#c6a052]" />
-    Berlin &amp; Brandenburg
-  </span>
-            
-          </div>
-          <div>
-            
-            <div className="eyebrow">Über Black Heroes</div>
-            <h2 className="section-title">Mehr als Präsenz. Verantwortung, die Vertrauen schafft.</h2>
-            <p className="section-copy">Sicherheit bedeutet für uns, aufmerksam zu sein, vorausschauend zu handeln und Menschen respektvoll zu begegnen. Black Heroes steht für einen professionellen Sicherheitsdienst, der die Anforderungen seiner Kunden versteht und passende Lösungen entwickelt.</p>
-            <p className="section-copy mt-4">Ob Gewerbeobjekt, Baustelle oder Veranstaltung: Wir legen Wert auf klare Kommunikation, zuverlässige Abläufe und einen souveränen Auftritt.</p>
-            <a href="#kontakt" className="mt-8 inline-flex items-center gap-2 font-extrabold text-[#96702f]">Lernen Sie uns kennen <ArrowRight size={17} /></a>
-            <div className="mt-9 grid grid-cols-3 gap-4 border-t border-[var(--line)] pt-6">
-              <div><strong className="block text-2xl">01</strong><span className="text-xs text-[var(--muted)]">Verantwortung</span></div>
-              <div><strong className="block text-2xl">02</strong><span className="text-xs text-[var(--muted)]">Aufmerksamkeit</span></div>
-              <div><strong className="block text-2xl">03</strong><span className="text-xs text-[var(--muted)]">Vertrauen</span></div>
             </div>
-          </div>
+          </section>
+
+          <section aria-labelledby="team-values-heading" className="mt-16 sm:mt-20">
+            <div className="mb-9 max-w-2xl">
+              <div className="eyebrow">Wofür wir stehen</div>
+              <h3 id="team-values-heading" className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Unsere Werte und unser Anspruch</h3>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-[#66635d] sm:text-base">
+                Verlässliche Sicherheitsarbeit beginnt für uns mit Haltung im Team und im täglichen Kontakt mit den Menschen, für die wir da sind.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              {teamValues.map(({ icon: Icon, title, text }) => (
+                <article key={title} className="border border-[var(--line)] bg-white p-5 transition-colors hover:border-[#c6a052]/60 sm:p-6">
+                  <div className="mb-5 flex h-11 w-11 items-center justify-center border border-[#c6a052]/30 bg-[#c6a052]/10 text-[#96702f]">
+                    <Icon size={21} aria-hidden="true" />
+                  </div>
+                  <h4 className="text-base font-extrabold">{title}</h4>
+                  <p className="mt-2 text-sm leading-6 text-[#66635d]">{text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section aria-labelledby="qualifications-heading" className="mt-16 border border-[#c6a052]/25 bg-[#171717] px-6 py-8 text-white sm:mt-20 sm:px-8 sm:py-10">
+            <div className="mb-8 max-w-2xl">
+              <div className="eyebrow">Fachliche Grundlagen</div>
+              <h3 id="qualifications-heading" className="section-title !mb-0 text-white">Qualifikationen unserer Mitarbeiter</h3>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {qualifications.map(({ icon: Icon, title, text }) => (
+                <article key={title} className="group min-h-44 border border-white/10 bg-white/[0.03] p-5 transition duration-300 hover:-translate-y-1 hover:border-[#c6a052]/60 hover:bg-white/[0.06] motion-reduce:transition-none">
+                  <div className="mb-5 flex h-11 w-11 items-center justify-center border border-[#c6a052]/30 bg-[#c6a052]/10 text-[#c6a052] transition-colors group-hover:bg-[#c6a052]/15">
+                    <Icon size={21} aria-hidden="true" />
+                  </div>
+                  <h4 className="text-base font-bold leading-snug text-[#dfc58e]">{title}</h4>
+                  <p className="mt-2 text-sm leading-6 text-white/70">{text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
       </section>
 
@@ -214,7 +276,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <p className="max-w-3xl text-base leading-7 text-[#66635d]">
-                    Ob Konzert, Festival oder Veranstaltung in geschlossenen Räumen: Black Heroes unterstützt Veranstalter mit einem eingespielten Sicherheitskonzept und einer präsenten, serviceorientierten Mannschaft. Wir stimmen unsere Abläufe auf Ort, Publikum und Programm ab – damit Gäste sich willkommen und Veranstalter gut begleitet fühlen.
+                    Ob Konzert, Festival oder Veranstaltung in geschlossenen Räumen: Black Heroes unterstützt Veranstalter mit einem eingespielten Sicherheitskonzept und einer präsenten, serviceorientierten Mannschaft. Wir stimmen unsere Abläufe auf Ort, Publikum und Programm ab damit Gäste sich willkommen und Veranstalter gut begleitet fühlen.
                   </p>
                   <ul className="mt-7 grid gap-x-8 gap-y-4 sm:grid-cols-2">
                     {[
@@ -257,21 +319,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="einsatzbereiche" className="section">
-        <div className="container">
-          <SectionHeading label="Einsatzbereiche" title="Sicherheit dort, wo sie gebraucht wird." copy="Wir unterstützen Unternehmen, Veranstalter und Einrichtungen mit passenden Sicherheitsleistungen. Sprechen Sie mit uns über Ihre konkrete Situation." />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {["Gewerbe & Büro", "Baustellen & Anlagen", "Veranstaltungen", "Einzelhandel & Empfang"].map((item, i) => (
-              <div key={item} className="border border-[var(--line)] p-7">
-                <span className="text-xs font-black tracking-widest text-[#a17c3d]">0{i + 1}</span>
-                <h3 className="mt-8 text-lg font-extrabold">{item}</h3>
-                <p className="mt-3 text-sm leading-6 text-[#77736b]">Aufmerksame Präsenz und abgestimmte Abläufe für Ihren Einsatzbereich.</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="section bg-[#f0e9da]">
         <div className="container grid items-center gap-12 lg:grid-cols-2">
           <div>
@@ -282,7 +329,15 @@ export default function HomePage() {
               {["Persönliche Abstimmung Ihres Bedarfs", "Klare Aufgaben und Zuständigkeiten", "Respektvoller Umgang mit Kunden und Besuchern"].map(x => <li className="flex items-center gap-3" key={x}><CheckCircle2 className="text-[#a17c3d]" size={18} />{x}</li>)}
             </ul>
           </div>
-          <div className="placeholder min-h-[400px]">/images/security-team-at-work.jpg</div>
+          <div className="relative min-h-[400px] overflow-hidden">
+            <Image
+              src={assetPath("/images/blackhero_banner.webp")}
+              alt="Black Heroes Security"
+              fill
+              sizes="(max-width: 1023px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
         </div>
       </section>
 

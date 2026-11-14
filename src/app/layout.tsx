@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { CookieConsentProvider } from "@/components/cookie-consent";
 import { assetPath } from "@/lib/asset-path";
 
 export const metadata: Metadata = {
@@ -25,9 +26,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="de">
       <body>
-        <Navbar />
-        {children}
-        <Footer />
+        <CookieConsentProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </CookieConsentProvider>
       </body>
     </html>
   );

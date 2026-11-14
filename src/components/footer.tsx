@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ShieldCheck, Phone, Globe, ArrowUpRight } from "lucide-react";
+import { CookieSettingsLink } from "@/components/cookie-consent";
 
 export function Footer() {
   return (
@@ -32,6 +33,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="container flex flex-col justify-between gap-3 py-5 text-xs text-white/45 sm:flex-row">
           <span>© {new Date().getFullYear()} Black Heroes Security. Alle Rechte vorbehalten.</span>
+          <CookieSettingsLink />
           <span className="flex items-center gap-2"><ShieldCheck size={14} className="text-[#c6a052]" /> Sicherheit mit Vertrauen</span>
         </div>
       </div>
