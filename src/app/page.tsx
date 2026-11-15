@@ -7,6 +7,7 @@ import {
 import Image from "next/image";
 import { Hero3D } from "@/components/hero-3d";
 import { TestimonialCarousel } from "@/components/testimonial-carousel";
+import { ContactForm } from "@/components/contact-form";
 import { assetPath } from "@/lib/asset-path";
 
 const services = [
@@ -448,19 +449,7 @@ export default function HomePage() {
               <div className="flex items-center gap-4 font-bold"><span className="flex h-11 w-11 items-center justify-center bg-white text-[#96702f]"><Clock3 size={19} /></span> Anfragen nach Vereinbarung</div>
             </div>
           </div>
-          <form className="bg-white p-7 shadow-sm sm:p-10" action="mailto:kontakt@blackheroes.de" method="post" encType="text/plain">
-            <h3 className="text-2xl font-extrabold">Ihre Anfrage</h3>
-            <p className="mt-2 text-sm text-[#77736b]">Die Formularübermittlung muss vor dem Livegang mit einer sicheren serverseitigen Lösung verbunden werden.</p>
-            <div className="mt-7 grid gap-5 sm:grid-cols-2">
-              <label className="text-sm font-bold">Name<input required name="name" autoComplete="name" className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
-              <label className="text-sm font-bold">Unternehmen<input name="company" autoComplete="organization" className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
-              <label className="text-sm font-bold">E-Mail<input required type="email" name="email" autoComplete="email" className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
-              <label className="text-sm font-bold">Telefon<input name="phone" type="tel" autoComplete="tel" className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
-            </div>
-            <label className="mt-5 block text-sm font-bold">Worum geht es?<select name="service" className="mt-2 w-full border border-[var(--line)] bg-white p-3 font-normal"><option>Bitte auswählen</option>{services.map(s => <option key={s.title}>{s.title}</option>)}</select></label>
-            <label className="mt-5 block text-sm font-bold">Nachricht<textarea required name="message" rows={5} className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
-            <button className="btn btn-gold mt-6 w-full" type="submit">Anfrage vorbereiten <ArrowRight size={17} /></button>
-          </form>
+          <ContactForm services={services.map(service => service.title)} />
         </div>
       </section>
     </main>

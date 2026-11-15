@@ -88,11 +88,12 @@ export default function DatenschutzPage() {
               Anfragen.
             </p>
             <p>
-              Das Anfrageformular auf der Website verwendet eine mailto:-Adresse und öffnet das E-Mail-Programm
-              Ihres Geräts. Die Formularangaben werden dadurch nicht an einen serverseitigen Formularanbieter
-              übermittelt. Als Empfängeradresse ist im Formular kontakt@blackheroes.de hinterlegt. Die Nachricht
-              wird erst versandt, wenn Sie den Versand in Ihrem E-Mail-Programm selbst bestätigen; für die
-              Übermittlung und Verarbeitung durch Ihren E-Mail-Dienst gelten zusätzlich dessen Bedingungen.
+              Wenn Sie das Anfrageformular absenden, werden die von Ihnen eingegebenen Angaben zur Bearbeitung
+              Ihrer Anfrage über unseren Webserver verarbeitet und per E-Mail an amin.j@blackheroes.de
+              übermittelt. Für den E-Mail-Versand wird der SMTP-Dienst von IONOS verwendet. Die Angaben werden
+              nicht in einer Website-Datenbank gespeichert; die E-Mail wird in unserem Postfach so lange
+              aufbewahrt, wie dies für die Bearbeitung erforderlich ist oder gesetzliche Pflichten beziehungsweise
+              die Geltendmachung oder Abwehr von Ansprüchen eine weitere Speicherung erfordern.
             </p>
             <p>
               Wir bewahren Anfragen nur so lange auf, wie dies für deren Bearbeitung erforderlich ist oder
