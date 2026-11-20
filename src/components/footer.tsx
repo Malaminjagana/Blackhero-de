@@ -11,7 +11,7 @@ export function Footer() {
             <div className="grid h-12 w-12 place-items-center border border-[#c6a052] text-xs font-black text-[#c6a052]">BH</div>
             <div><strong className="block tracking-[.08em]">BLACK HEROES</strong><span className="text-xs font-bold tracking-[.25em] text-[#c6a052]">SECURITY</span></div>
           </div>
-          <p className="mt-6 max-w-sm text-sm leading-7 text-white/55">Sicherheit mit Vertrauen. Ihr Ansprechpartner für professionelle Sicherheitsdienstleistungen in Berlin und Brandenburg.</p>
+          <p className="mt-6 max-w-sm text-sm leading-7 text-white/55">Sicherheit mit Vertrauen. Ihr Ansprechpartner für professionelle Sicherheitsdienstleistungen in Berlin und deutschlandweit.</p>
         </div>
         <div>
           <h3 className="font-extrabold">Navigation</h3>

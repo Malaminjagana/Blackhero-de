@@ -62,23 +62,41 @@ Follow these steps for each change:
 
 If you are working on a branch other than `main`, do not push it as `main`; integrate the reviewed changes into `main` before expecting production deployment.
 
-## Vercel deployment and contact form
+## Environment Variables and Configuration
 
-The project uses the Next.js server runtime for its `/api/contact` route and cannot be deployed as a static GitHub Pages export. Connect this repository to Vercel and use the standard Next.js build settings. Vercel can deploy the configured production branch automatically on pushes.
+The contact form sends email through the server-side `/api/contact` route using Nodemailer and an SMTP mailbox. The site itself can run and build without SMTP credentials, but contact form delivery will fail until all five SMTP variables are configured.
 
-Set these variables in the local `.env.local` file for development and in **Vercel → Project → Settings → Environment Variables** for each Vercel environment where the form should send mail:
+Copy [`.env.example`](./.env.example) to `.env.local` for local development, then fill in the values from the SMTP provider:
 
-| Variable | Value |
-| --- | --- |
-| `SMTP_HOST` | `smtp.ionos.de` |
-| `SMTP_PORT` | `587` |
-| `SMTP_SECURE` | `false` |
-| `SMTP_USER` | `amin.j@blackheroes.de` |
-| `SMTP_PASSWORD` | Your IONOS mailbox password |
+```bash
+cp .env.example .env.local
+```
 
-Use [`.env.example`](./.env.example) as a template. Never commit `.env.local` or an actual mailbox password. SMTP variables must remain server-side; do not prefix them with `NEXT_PUBLIC_`. GitHub Pages cannot run the SMTP API route, so the active deployment must use a server-capable host such as Vercel.
+`.env.local` is for machine-specific credentials and is excluded from Git. `.env.example` is committed so developers can see which settings the application expects; it contains blank placeholders only and must never contain real credentials. Do not commit `.env.local`, share mailbox passwords, or expose SMTP values through `NEXT_PUBLIC_` variables.
 
-In development, keep `NEXT_PUBLIC_BASE_PATH` unset unless you intentionally serve the app below a URL subpath. Always use `assetPath()` for public assets.
+| Variable | Purpose | Required? | Where to obtain it | Local / production |
+| --- | --- | --- | --- | --- |
+| `SMTP_HOST` | SMTP server used by Nodemailer | Required for contact email | Mail provider's SMTP settings (currently intended for IONOS) | Set in `.env.local` and Vercel |
+| `SMTP_PORT` | SMTP server port | Required for contact email | Mail provider's SMTP settings | Set in `.env.local` and Vercel |
+| `SMTP_SECURE` | Whether SMTP uses implicit TLS (`true` or `false`) | Required for contact email | Match the provider's connection settings | Set in `.env.local` and Vercel |
+| `SMTP_USER` | SMTP mailbox username | Required for contact email | Mailbox account details from the provider | Set in `.env.local` and Vercel |
+| `SMTP_PASSWORD` | SMTP mailbox password | Required for contact email | Mailbox account credentials from the provider | Set in `.env.local` and Vercel |
+| `NEXT_PUBLIC_BASE_PATH` | URL prefix for deployments hosted below a path | Optional; leave empty for a root-domain deployment | Your deployment's URL path, if applicable | Local or production only when using a subpath; this is public configuration, not a secret |
+
+For Vercel, add the five SMTP variables in **Project → Settings → Environment Variables** for each environment where the form should send mail (Development, Preview, and/or Production). Keep them server-side and use the provider's documented host, port, and TLS mode. `NEXT_PUBLIC_BASE_PATH` is normally unnecessary on Vercel and should only be set for a subpath deployment.
+
+The application currently sends contact messages to a recipient address configured in the server route; that recipient is not an API credential and is not one of the environment variables. The SMTP credentials are read only by the server route. The client-side `NEXT_PUBLIC_BASE_PATH` setting only controls asset URL paths.
+
+The `/api/contact` route requires the standard Next.js server runtime, so the application cannot use a static-only host for email delivery. Vercel supports the required route. Always use `assetPath()` for public assets.
+
+### Test the contact form locally
+
+1. Copy `.env.example` to `.env.local` and fill in all five SMTP values using the provider's settings.
+2. Run `npm run dev` and open the local website.
+3. Submit the contact form with valid details and confirm delivery to the configured recipient mailbox.
+4. Verify that invalid input is rejected and that the form displays its success or error status.
+
+Do not use a real password in source control or paste it into a public issue or pull request. Email delivery should only be reported as verified after an actual delivery test.
 
 For example:
 

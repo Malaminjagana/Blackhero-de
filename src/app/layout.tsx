@@ -7,7 +7,7 @@ import { assetPath } from "@/lib/asset-path";
 
 export const metadata: Metadata = {
   title: "Black Heroes Security | Sicherheit mit Vertrauen",
-  description: "Professionelle Sicherheitsdienstleistungen in Berlin und Brandenburg. Objekt-, Event- und Revierdienst mit Verantwortung und Vertrauen.",
+  description: "Professionelle Sicherheitsdienstleistungen in Berlin und deutschlandweit. Objekt-, Event- und Revierdienst mit Verantwortung und Vertrauen.",
   icons: {
     icon: assetPath("/images/black-heroes-logo-transparent.webp")
   },

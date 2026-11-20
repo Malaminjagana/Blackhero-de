@@ -16,7 +16,8 @@ const services = [
   { icon: Eye, title: "Revierdienst", text: "Mobile Kontrollen und regelmäßige Streifenfahrten zur Prävention und frühzeitigen Erkennung von Risiken.", image: "/images/Blackhero_Revierdienst.webp", imageAlt: "Black Heroes Sicherheitsmitarbeiter auf nächtlicher Kontrollfahrt an einem Geschäftsgebäude" },
   { icon: ShieldCheck, title: "Baustellenbewachung", text: "Schutz von Baustellen, Material und Maschinen – abgestimmt auf die Anforderungen Ihres Projekts.", image: "/images/Blackhero_Baustellenbewachung.webp", imageAlt: "Black Heroes Mitarbeiter überwacht eine Baustelle mit Baugerüst und Kran" },
   { icon: Users, title: "Empfangs- & Pfortendienst", text: "Ein professioneller erster Eindruck mit aufmerksamer Besucherbetreuung und geregeltem Zutritt.", image: "/images/Blackhero-Empfangs- Pfortendienst.webp", imageAlt: "Black Heroes Mitarbeiter begrüßt eine Besucherin am Empfang" },
-  { icon: BadgeCheck, title: "Individuelle Sicherheitslösungen", text: "Wir betrachten Ihre Situation genau und entwickeln ein passendes Sicherheitskonzept.", image: "/images/Blackhero_Individuelle Sicherheitslösungen.webp", imageAlt: "Black Heroes Sicherheitsmitarbeiter besprechen einen individuellen Einsatzplan vor einem Bürogebäude" }
+  { icon: BadgeCheck, title: "Individuelle Sicherheitslösungen", text: "Wir betrachten Ihre Situation genau und entwickeln ein passendes Sicherheitskonzept.", image: "/images/Blackhero_Individuelle Sicherheitslösungen.webp", imageAlt: "Black Heroes Sicherheitsmitarbeiter besprechen einen individuellen Einsatzplan vor einem Bürogebäude" },
+  { icon: ShieldCheck, category: "PERSONENSCHUTZ", title: "Professioneller Personenschutz mit Verantwortung", text: "Wir schützen Menschen in besonderen Situationen durch diskrete, vorausschauende und individuell abgestimmte Sicherheitsmaßnahmen. Unsere Sicherheitskräfte sorgen für Schutz, Sicherheit und ein zuverlässiges Auftreten bei persönlichen Terminen, geschäftlichen Anlässen und öffentlichen Veranstaltungen.", image: "/images/personen_schutzt.webp", imageAlt: "Sicherheitskraft im Personenschutz", imagePosition: "object-[center_10%]" }
 ];
 
 const advantages = [
@@ -28,7 +29,7 @@ const advantages = [
 
 const faqs = [
   ["Welche Sicherheitsleistungen bietet Black Heroes an?", "Wir bieten Sicherheitslösungen wie Objektschutz, Veranstaltungsschutz, Revierdienst, Baustellenbewachung sowie Empfangs- und Pfortendienste an. Der konkrete Leistungsumfang wird gemeinsam mit Ihnen abgestimmt."],
-  ["In welchen Regionen ist Black Heroes tätig?", "Unser Schwerpunkt liegt in Berlin und Brandenburg. Fragen Sie uns gerne an, wenn Ihr Einsatzort außerhalb dieser Region liegt."],
+  ["In welchen Regionen ist Black Heroes tätig?", "Unser Schwerpunkt liegt in Berlin und deutschlandweit. Fragen Sie uns gerne an, wenn Ihr Einsatzort außerhalb dieser Region liegt."],
   ["Wie kann ich ein Angebot anfragen?", "Nutzen Sie das Kontaktformular oder rufen Sie uns direkt an. Teilen Sie uns möglichst Einsatzort, Zeitraum und den gewünschten Leistungsumfang mit."],
   ["Kann die Sicherheitsleistung individuell angepasst werden?", "Ja. Nach Klärung Ihrer Anforderungen stimmen wir Personal, Einsatzzeiten und Aufgaben auf Ihren Bedarf ab."]
 ];
@@ -102,7 +103,7 @@ export default function HomePage() {
                 </span>
                 <span className="inline-flex items-center gap-2 border border-[#c6a052]/35 bg-white/70 px-4 py-2.5 text-sm font-semibold">
                   <MapPin size={17} className="text-[#96702f]" aria-hidden="true" />
-                  Berlin &amp; Brandenburg
+                  Berlin und deutschlandweit
                 </span>
               </div>
               <a href="#kontakt" className="mt-7 inline-flex items-center gap-2 font-extrabold text-[#96702f]">
@@ -182,7 +183,7 @@ export default function HomePage() {
         <div className="container">
           <SectionHeading label="Unsere Leistungen" title="Sicherheitslösungen für unterschiedliche Anforderungen." copy="Jeder Einsatz ist anders. Deshalb stimmen wir unsere Leistungen auf Ihre örtlichen Gegebenheiten, Abläufe und Schutzziele ab." />
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {services.filter(({ title }) => title !== "Veranstaltungsschutz").map(({ icon: Icon, title, text, image, imageAlt }) => (
+            {services.filter(({ title }) => title !== "Veranstaltungsschutz").map(({ icon: Icon, category, title, text, image, imageAlt, imagePosition }) => (
               <article className="card group overflow-hidden" key={title}>
                 <div className="relative aspect-[16/9] overflow-hidden bg-[#202020]">
                   <Image
@@ -190,11 +191,12 @@ export default function HomePage() {
                     alt={imageAlt}
                     fill
                     sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
+                    className={`object-cover ${imagePosition ?? ""} transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none`}
                   />
                 </div>
                 <div className="p-7">
                   <div className="mb-5 flex h-11 w-11 items-center justify-center bg-[#f0e9da] text-[#96702f]"><Icon size={22} /></div>
+                  {category && <div className="eyebrow mb-2">{category}</div>}
                   <h3 className="text-xl font-extrabold">{title}</h3>
                   <p className="mt-3 min-h-[82px] text-sm leading-7 text-[#6d6961]">{text}</p>
                   <a href="#kontakt" className="mt-5 inline-flex items-center gap-2 text-sm font-extrabold text-[#96702f]">Leistung anfragen <ArrowRight size={16} /></a>
@@ -445,11 +447,54 @@ export default function HomePage() {
             <p className="section-copy">Sie möchten ein Angebot anfragen oder haben Fragen zu unseren Leistungen? Wir freuen uns auf Ihre Nachricht.</p>
             <div className="mt-9 space-y-5">
               <a className="flex items-center gap-4 font-bold" href="tel:+491776105240"><span className="flex h-11 w-11 items-center justify-center bg-white text-[#96702f]"><Phone size={19} /></span> +49 177 6105240</a>
-              <div className="flex items-center gap-4 font-bold"><span className="flex h-11 w-11 items-center justify-center bg-white text-[#96702f]"><MapPin size={19} /></span> Berlin und Brandenburg</div>
+              <div className="flex items-center gap-4 font-bold"><span className="flex h-11 w-11 items-center justify-center bg-white text-[#96702f]"><MapPin size={19} /></span> Berlin und deutschlandweit</div>
               <div className="flex items-center gap-4 font-bold"><span className="flex h-11 w-11 items-center justify-center bg-white text-[#96702f]"><Clock3 size={19} /></span> Anfragen nach Vereinbarung</div>
             </div>
           </div>
           <ContactForm services={services.map(service => service.title)} />
+        </div>
+      </section>
+
+      <section aria-labelledby="certifications-heading" className="section">
+        <div className="container">
+          <div className="mb-12 max-w-3xl">
+            <h2 id="certifications-heading" className="section-title">QUALITÄT NACH KLAREN STANDARDS.</h2>
+            <p className="section-copy">
+              Qualität, Zuverlässigkeit und klare Prozesse bilden die Grundlage unserer Arbeit. Wir orientieren uns an anerkannten Standards der Sicherheitsbranche und setzen auf strukturierte Abläufe, qualifiziertes Personal und kontinuierliche Qualitätsverbesserung.
+            </p>
+          </div>
+          <div className="grid border border-[var(--line)] md:grid-cols-2">
+            <article className="p-6 sm:p-9">
+              <Image
+                src={assetPath("/images/dekra-din-77200-1 copy.avif")}
+                alt="DEKRA-Abbildung zur DIN 77200-1"
+                width={750}
+                height={417}
+                sizes="(max-width: 767px) 100vw, 360px"
+                className="h-auto w-full max-w-[360px] object-contain object-left"
+              />
+              <div className="mt-6 font-mono text-xs uppercase tracking-[.2em] text-[#96702f]">DIN 77200-1</div>
+              <h3 className="mt-4 text-xl font-extrabold tracking-tight sm:text-2xl">Qualitätsstandard für Sicherheitsdienstleistungen</h3>
+              <p className="mt-4 text-sm leading-7 text-[#66635d]">
+                Die DIN 77200-1 definiert Anforderungen an professionelle Sicherheitsdienstleistungen. Sie bildet einen wichtigen Rahmen für die Organisation, Qualifikation des eingesetzten Personals und die Durchführung von Sicherheitsaufträgen.
+              </p>
+            </article>
+            <article className="border-t border-[var(--line)] p-6 sm:p-9 md:border-l md:border-t-0">
+              <Image
+                src={assetPath("/images/dekra-iso-9001 copy.avif")}
+                alt="DEKRA-Abbildung zur ISO 9001"
+                width={750}
+                height={322}
+                sizes="(max-width: 767px) 100vw, 360px"
+                className="h-auto w-full max-w-[360px] object-contain object-left"
+              />
+              <div className="mt-6 font-mono text-xs uppercase tracking-[.2em] text-[#96702f]">ISO 9001:2015</div>
+              <h3 className="mt-4 text-xl font-extrabold tracking-tight sm:text-2xl">Systematisches Qualitätsmanagement</h3>
+              <p className="mt-4 text-sm leading-7 text-[#66635d]">
+                Ein strukturiertes Qualitätsmanagement unterstützt klare Verantwortlichkeiten, nachvollziehbare Prozesse und eine kontinuierliche Verbesserung unserer betrieblichen Abläufe. Die ISO 9001 bildet hierfür einen international anerkannten Standard.
+              </p>
+            </article>
+          </div>
         </div>
       </section>
     </main>
