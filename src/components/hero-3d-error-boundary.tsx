@@ -24,6 +24,7 @@ export function Hero3DFallback() {
         alt=""
         fill
         sizes="100vw"
+        priority
         className="object-contain opacity-25"
       />
       <div

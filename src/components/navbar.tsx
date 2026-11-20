@@ -9,7 +9,7 @@ import { assetPath } from "@/lib/asset-path";
 const links = [
   ["Über uns", "#ueber-uns"],
   ["Leistungen", "#leistungen"],
-  ["Einsatzbereiche", "#einsatzbereiche"],
+  ["Einsatzbereiche", "#leistungen"],
   ["Kontakt", "#kontakt"]
 ];
 
@@ -24,6 +24,7 @@ export function Navbar() {
             alt="Black Heroes Security"
             width={1680}
             height={1504}
+            sizes="64px"
             priority
             className="h-14 w-auto object-contain sm:h-16"
           />

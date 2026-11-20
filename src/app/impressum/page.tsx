@@ -1,3 +1,32 @@
+import type { Metadata } from "next";
+import { SITE_NAME, SOCIAL_IMAGE } from "@/lib/site";
+
+const description =
+  "Impressum der Black Heroes Security GmbH mit Unternehmensangaben, Registereintrag und Kontaktmöglichkeiten.";
+
+export const metadata: Metadata = {
+  title: "Impressum",
+  description,
+  alternates: {
+    canonical: "/impressum/"
+  },
+  openGraph: {
+    title: `Impressum | ${SITE_NAME}`,
+    description,
+    url: "/impressum/",
+    siteName: SITE_NAME,
+    locale: "de_DE",
+    type: "website",
+    images: [SOCIAL_IMAGE]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Impressum | ${SITE_NAME}`,
+    description,
+    images: [SOCIAL_IMAGE]
+  }
+};
+
 export default function ImpressumPage() {
   return (
     <main className="container min-h-[60vh] py-16 sm:py-20">

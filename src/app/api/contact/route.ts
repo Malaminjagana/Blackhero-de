@@ -3,12 +3,26 @@ import nodemailer from "nodemailer";
 
 export const runtime = "nodejs";
 
-const recipient = "amin.j@blackheroes.de";
+const recipients: string[] = ["amin.j@blackheroes.de", "support@blackheroessecurity.de"];
 const invalidInputMessage = "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.";
 const deliveryErrorMessage =
-  "Ihre Nachricht konnte derzeit nicht gesendet werden. Bitte versuchen Sie es später erneut.";
+  "Ihre Nachricht konnte leider nicht gesendet werden. Bitte versuchen Sie es erneut oder kontaktieren Sie uns telefonisch.";
+const maxRequestBytes = 16_384;
+const rateLimitWindowMs = 15 * 60 * 1000;
+const rateLimitMaxRequests = 5;
+const maxRateLimitEntries = 5_000;
 const emailPattern =
   /^[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?$/i;
+const allowedServices = new Set([
+  "Objektschutz",
+  "Veranstaltungsschutz",
+  "Revierdienst",
+  "Baustellenbewachung",
+  "Empfangs- & Pfortendienst",
+  "Individuelle Sicherheitslösungen",
+  "Professioneller Personenschutz mit Verantwortung",
+]);
+const rateLimitEntries = new Map<string, { count: number; resetAt: number }>();
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -42,7 +56,50 @@ function isValidEmail(value: string): boolean {
   );
 }
 
+function isValidPhone(value: string): boolean {
+  if (!value) return true;
+  const digitCount = value.replace(/\D/g, "").length;
+  return (
+    digitCount >= 7 &&
+    digitCount <= 15 &&
+    /^(?:\+|00)?\d[\d\s()./-]*$/.test(value)
+  );
+}
+
+function getClientIp(request: Request): string {
+  const forwardedIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return request.headers.get("x-real-ip")?.trim() || forwardedIp || "unknown";
+}
+
+function isRateLimited(clientIp: string): boolean {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitEntries) {
+    if (entry.resetAt <= now) rateLimitEntries.delete(ip);
+  }
+
+  const existing = rateLimitEntries.get(clientIp);
+
+  if (existing) {
+    if (existing.count >= rateLimitMaxRequests) return true;
+    existing.count += 1;
+    return false;
+  }
+
+  if (rateLimitEntries.size >= maxRateLimitEntries) return true;
+
+  rateLimitEntries.set(clientIp, {
+    count: 1,
+    resetAt: now + rateLimitWindowMs,
+  });
+  return false;
+}
+
 export async function POST(request: Request) {
+  const contentLength = Number(request.headers.get("content-length"));
+  if (Number.isFinite(contentLength) && contentLength > maxRequestBytes) {
+    return NextResponse.json({ error: invalidInputMessage }, { status: 413 });
+  }
+
   let payload: unknown;
   try {
     payload = await request.json();
@@ -73,9 +130,21 @@ export async function POST(request: Request) {
     website !== "" ||
     [name, company, phone, service].some(hasControlCharacters) ||
     /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(message) ||
-    !isValidEmail(email)
+    !isValidEmail(email) ||
+    !isValidPhone(phone) ||
+    !allowedServices.has(service)
   ) {
     return NextResponse.json({ error: invalidInputMessage }, { status: 400 });
+  }
+
+  if (isRateLimited(getClientIp(request))) {
+    return NextResponse.json(
+      { error: deliveryErrorMessage },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil(rateLimitWindowMs / 1000)) },
+      }
+    );
   }
 
   const host = process.env.SMTP_HOST;
@@ -84,17 +153,29 @@ export async function POST(request: Request) {
   const user = process.env.SMTP_USER;
   const password = process.env.SMTP_PASSWORD;
 
+  const missingConfiguration = [
+    !host && "SMTP_HOST",
+    (!Number.isInteger(port) || port < 1 || port > 65535) && "SMTP_PORT",
+    (secureValue !== "true" && secureValue !== "false") && "SMTP_SECURE",
+    (!user || !isValidEmail(user)) && "SMTP_USER",
+    !password && "SMTP_PASSWORD",
+  ].filter((variable): variable is string => Boolean(variable));
+
   if (
+    missingConfiguration.length > 0 ||
     !host ||
     !Number.isInteger(port) ||
     port < 1 ||
     port > 65535 ||
     (secureValue !== "true" && secureValue !== "false") ||
     !user ||
+    !isValidEmail(user) ||
     !password
   ) {
-    console.error("Contact form SMTP configuration is incomplete or invalid.");
-    return NextResponse.json({ error: deliveryErrorMessage }, { status: 500 });
+    console.error("Contact form SMTP configuration is incomplete or invalid.", {
+      missingVariables: missingConfiguration,
+    });
+    return NextResponse.json({ error: deliveryErrorMessage }, { status: 503 });
   }
 
   const secure = secureValue === "true";
@@ -104,12 +185,15 @@ export async function POST(request: Request) {
       port,
       secure,
       requireTLS: !secure,
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 20_000,
       auth: { user, pass: password },
     });
 
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: { name: "Black Heroes", address: user },
-      to: recipient,
+      to: recipients,
       replyTo: email,
       subject: "Neue Kontaktanfrage – Black Heroes",
       text: [
@@ -125,6 +209,15 @@ export async function POST(request: Request) {
         message,
       ].join("\n"),
     });
+
+    const acceptedRecipients = new Set(info.accepted.map((address) => address.toLowerCase()));
+    if (!recipients.every((address) => acceptedRecipients.has(address))) {
+      console.error("SMTP did not accept all contact form recipients.", {
+        acceptedCount: info.accepted.length,
+        rejectedCount: info.rejected.length,
+      });
+      return NextResponse.json({ error: deliveryErrorMessage }, { status: 502 });
+    }
 
     return NextResponse.json({ message: "Ihre Nachricht wurde erfolgreich gesendet." });
   } catch (error) {

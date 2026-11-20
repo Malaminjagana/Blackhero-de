@@ -5,9 +5,9 @@ const nextConfig: NextConfig = {
   // Set NEXT_PUBLIC_BASE_PATH only for deployments hosted below a repository path.
   basePath: process.env.NEXT_PUBLIC_BASE_PATH ?? "",
 
-  // Keep the existing public image URLs unchanged.
+  // Use Next.js image optimization on Vercel; preserve static URLs on other hosts.
   images: {
-    unoptimized: true,
+    unoptimized: process.env.VERCEL !== "1",
   },
 
   // Generate routes as folders with index.html

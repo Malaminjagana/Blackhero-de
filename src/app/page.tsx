@@ -9,6 +9,7 @@ import { Hero3D } from "@/components/hero-3d";
 import { TestimonialCarousel } from "@/components/testimonial-carousel";
 import { ContactForm } from "@/components/contact-form";
 import { assetPath } from "@/lib/asset-path";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 const services = [
   { icon: Building2, title: "Objektschutz", text: "Zuverlässige Präsenz und strukturierte Kontrollgänge zum Schutz von Gebäuden, Anlagen und Sachwerten.", image: "/images/Blackhero_Objektschutz.webp", imageAlt: "Sicherheitsmitarbeiter kontrolliert den Zugang an einem Gewerbegebäude" },
@@ -51,6 +52,60 @@ const teamValues = [
   { icon: Handshake, title: "Vertrauen", text: "Wir schaffen durch transparente Kommunikation und zuverlässige Arbeit eine vertrauensvolle Zusammenarbeit." }
 ];
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: `${SITE_URL}/`,
+      logo: `${SITE_URL}/images/black-heroes-logo-transparent.webp`,
+      telephone: "+49 177 6105240",
+      email: "support@blackheroessecurity.de",
+      areaServed: [
+        { "@type": "City", name: "Berlin" },
+        { "@type": "Country", name: "Deutschland" }
+      ],
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: "+49 177 6105240",
+        email: "support@blackheroessecurity.de",
+        contactType: "customer service",
+        availableLanguage: "German"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: SITE_NAME,
+      inLanguage: "de-DE",
+      publisher: { "@id": `${SITE_URL}/#organization` }
+    },
+    {
+      "@type": "Service",
+      "@id": `${SITE_URL}/#security-services`,
+      name: "Sicherheitsdienstleistungen",
+      serviceType: [
+        "Objektschutz",
+        "Veranstaltungsschutz",
+        "Baustellenbewachung",
+        "Revierdienst",
+        "Empfangs- und Pfortendienst",
+        "Personenschutz",
+        "Ausstellungsbewachung",
+        "Filmsetbewachung"
+      ],
+      provider: { "@id": `${SITE_URL}/#organization` },
+      areaServed: [
+        { "@type": "City", name: "Berlin" },
+        { "@type": "Country", name: "Deutschland" }
+      ]
+    }
+  ]
+};
+
 function SectionHeading({ label, title, copy, light = false }: { label: string; title: string; copy: string; light?: boolean }) {
   return <div className="mb-12">
     <div className="eyebrow">{label}</div>
@@ -62,6 +117,12 @@ function SectionHeading({ label, title, copy, light = false }: { label: string; 
 export default function HomePage() {
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c")
+        }}
+      />
       <Hero3D />
 
       <section id="ueber-uns" className="section scroll-mt-20">
@@ -227,6 +288,7 @@ export default function HomePage() {
                   alt=""
                   width={1680}
                   height={1504}
+                  sizes="36px"
                   className="h-9 w-9 object-contain"
                 />
                 <span className="text-xs font-bold uppercase tracking-[.16em] sm:text-sm">Black Heroes Security</span>
@@ -385,20 +447,20 @@ export default function HomePage() {
               <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#f0e9da] ring-1 ring-[#c6a052]/20">
                 <Image
                   src={assetPath("/images/M_traore.webp")}
-                  alt="Mousa Traoré, Geschäftsführer von Black Heroes Security"
+                  alt="sa Traoré, Geschäftsführer von Black Heroes Security"
                   fill
                   sizes="(max-width: 767px) 100vw, 50vw"
                   className="object-cover object-[center_25%]"
                 />
               </div>
               <div className="px-3 pb-3 pt-7 text-center">
-                <h3 className="text-2xl font-extrabold tracking-tight text-[#202020]">Mousa Traore</h3>
+                <h3 className="text-2xl font-extrabold tracking-tight text-[#202020]">Moussa Traore</h3>
                 <div className="mx-auto my-3 h-0.5 w-10 bg-[#c6a052]" />
-                <p className="text-base font-medium text-[#77736b]">Geschäftsführer</p>
+                <p className="text-base font-medium text-[#77736b]">Geschäftsführung(QMB)</p>
                 <div className="mt-4 flex flex-col items-center gap-2 text-sm text-[#6d6961]">
-                  <a href="mailto:kontakt@blackheroes.de" className="inline-flex items-center gap-2 transition-colors hover:text-[#96702f]">
+                  <a href="mailto:support@blackheroessecurity.de" className="inline-flex items-center gap-2 transition-colors hover:text-[#96702f]">
                     <Mail size={15} aria-hidden="true" />
-                    <span>kontakt@blackheroes.de</span>
+                    <span>support@blackheroessecurity.de</span>
                   </a>
                   <a href="tel:+491776105240" className="inline-flex items-center gap-2 transition-colors hover:text-[#96702f]">
                     <Phone size={15} aria-hidden="true" />
@@ -420,7 +482,7 @@ export default function HomePage() {
               <div className="px-3 pb-3 pt-7 text-center">
                 <h3 className="text-2xl font-extrabold tracking-tight text-[#202020]">M. Jagana</h3>
                 <div className="mx-auto my-3 h-0.5 w-10 bg-[#c6a052]" />
-                <p className="text-base font-medium text-[#77736b]">Verantwortlicher für Qualitätsmanagement</p>
+                <p className="text-base font-medium text-[#77736b]">Client Management(QM)</p>
                 <div className="mt-4 flex flex-col items-center gap-2 text-sm text-[#6d6961]">
                   <a href="mailto:amin.j@blackheroes.de" className="inline-flex items-center gap-2 transition-colors hover:text-[#96702f]">
                     <Mail size={15} aria-hidden="true" />

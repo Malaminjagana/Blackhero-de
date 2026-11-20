@@ -4,21 +4,51 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { CookieConsentProvider } from "@/components/cookie-consent";
 import { assetPath } from "@/lib/asset-path";
+import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL, SOCIAL_IMAGE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Black Heroes Security | Sicherheit mit Vertrauen",
-  description: "Professionelle Sicherheitsdienstleistungen in Berlin und deutschlandweit. Objekt-, Event- und Revierdienst mit Verantwortung und Vertrauen.",
-  icons: {
-    icon: assetPath("/images/black-heroes-logo-transparent.webp")
+  title: {
+    default: HOME_TITLE,
+    template: `%s | ${SITE_NAME}`
   },
-  metadataBase: new URL("https://blackheroes.de"),
+  description: HOME_DESCRIPTION,
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: "/"
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large"
+    }
+  },
+  icons: {
+    icon: assetPath("/favicon.ico")
+  },
   openGraph: {
-    title: "Black Heroes Security",
-    description: "Sicherheit mit Vertrauen.",
-    url: "https://blackheroes.de",
-    siteName: "Black Heroes Security",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    url: "/",
+    siteName: SITE_NAME,
     locale: "de_DE",
-    type: "website"
+    type: "website",
+    images: [
+      {
+        url: SOCIAL_IMAGE,
+        width: 1349,
+        height: 784,
+        alt: "Black Heroes Security"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    images: [SOCIAL_IMAGE]
   }
 };
 

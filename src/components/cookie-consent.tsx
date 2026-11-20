@@ -186,6 +186,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
                   alt=""
                   width={1680}
                   height={1504}
+                  sizes="40px"
                   className="h-10 w-10 object-contain"
                 />
               </span>

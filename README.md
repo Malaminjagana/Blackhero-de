@@ -3,7 +3,7 @@
 The Black Heroes Security website is a German-language corporate website built with the Next.js App Router, TypeScript, React, and Tailwind CSS v4. It is designed to run on Vercel, including its server-side contact form.
 
 - **Repository:** [Malaminjagana/Blackhero-de](https://github.com/Malaminjagana/Blackhero-de)
-- **Live website:** The URL assigned to the Vercel project
+- **Live website:** [https://www.blackheroes.de/](https://www.blackheroes.de/)
 - **Production branch:** `main`
 - **Deployment:** Vercel
 
@@ -64,7 +64,7 @@ If you are working on a branch other than `main`, do not push it as `main`; inte
 
 ## Environment Variables and Configuration
 
-The contact form sends email through the server-side `/api/contact` route using Nodemailer and an SMTP mailbox. The site itself can run and build without SMTP credentials, but contact form delivery will fail until all five SMTP variables are configured.
+The contact form sends email through the server-side `/api/contact` route using Nodemailer and the existing IONOS SMTP mailbox. The site itself can run and build without SMTP credentials, but contact form delivery returns a service-unavailable error until all five SMTP variables are configured. Each message is sent in one SMTP submission to `amin.j@blackheroes.de` and `support@blackheroessecurity.de`; the visitor's validated address is used only as `Reply-To`.
 
 Copy [`.env.example`](./.env.example) to `.env.local` for local development, then fill in the values from the SMTP provider:
 
@@ -79,22 +79,26 @@ cp .env.example .env.local
 | `SMTP_HOST` | SMTP server used by Nodemailer | Required for contact email | Mail provider's SMTP settings (currently intended for IONOS) | Set in `.env.local` and Vercel |
 | `SMTP_PORT` | SMTP server port | Required for contact email | Mail provider's SMTP settings | Set in `.env.local` and Vercel |
 | `SMTP_SECURE` | Whether SMTP uses implicit TLS (`true` or `false`) | Required for contact email | Match the provider's connection settings | Set in `.env.local` and Vercel |
-| `SMTP_USER` | SMTP mailbox username | Required for contact email | Mailbox account details from the provider | Set in `.env.local` and Vercel |
+| `SMTP_USER` | Authenticated SMTP mailbox address; also used as the sender | Required; must be an address the SMTP provider permits for sending | Mailbox account details from the provider | Set in `.env.local` and Vercel |
 | `SMTP_PASSWORD` | SMTP mailbox password | Required for contact email | Mailbox account credentials from the provider | Set in `.env.local` and Vercel |
 | `NEXT_PUBLIC_BASE_PATH` | URL prefix for deployments hosted below a path | Optional; leave empty for a root-domain deployment | Your deployment's URL path, if applicable | Local or production only when using a subpath; this is public configuration, not a secret |
 
 For Vercel, add the five SMTP variables in **Project → Settings → Environment Variables** for each environment where the form should send mail (Development, Preview, and/or Production). Keep them server-side and use the provider's documented host, port, and TLS mode. `NEXT_PUBLIC_BASE_PATH` is normally unnecessary on Vercel and should only be set for a subpath deployment.
 
-The application currently sends contact messages to a recipient address configured in the server route; that recipient is not an API credential and is not one of the environment variables. The SMTP credentials are read only by the server route. The client-side `NEXT_PUBLIC_BASE_PATH` setting only controls asset URL paths.
+The SMTP credentials are read only by the server route. The visitor never controls the sender address; `SMTP_USER` is used as the authenticated sender and the validated visitor address is set as `Reply-To`. Ensure that the mailbox and sending domain are authorized by the mail provider and that its recommended SPF/DKIM DNS records are configured. The current handler applies an in-memory limit of five valid submissions per IP per 15 minutes; because Vercel may run multiple function instances, configure a Vercel Firewall rate-limit rule for a distributed production limit.
 
 The `/api/contact` route requires the standard Next.js server runtime, so the application cannot use a static-only host for email delivery. Vercel supports the required route. Always use `assetPath()` for public assets.
+
+## Search engine metadata
+
+The homepage and legal pages use the Next.js Metadata API for unique titles, descriptions, Open Graph/Twitter cards, robots directives, and `www.blackheroes.de` canonicals. The App Router generates `/sitemap.xml` and `/robots.txt`; the sitemap intentionally lists only the homepage, Impressum, and Datenschutzerklärung. The middleware permanently redirects the apex host to the canonical `www` host.
 
 ### Test the contact form locally
 
 1. Copy `.env.example` to `.env.local` and fill in all five SMTP values using the provider's settings.
 2. Run `npm run dev` and open the local website.
-3. Submit the contact form with valid details and confirm delivery to the configured recipient mailbox.
-4. Verify that invalid input is rejected and that the form displays its success or error status.
+3. Submit a valid inquiry and confirm that it arrives at both `amin.j@blackheroes.de` and `support@blackheroessecurity.de`.
+4. Verify that invalid fields and a filled honeypot are rejected, and that SMTP configuration or delivery errors produce the generic form error without clearing the entered values.
 
 Do not use a real password in source control or paste it into a public issue or pull request. Email delivery should only be reported as verified after an actual delivery test.
 
@@ -110,15 +114,6 @@ import { assetPath } from "@/lib/asset-path";
 ```
 
 The actual image file must exist inside `public/images/` (in this example, `public/images/example.webp`). Keep asset paths and filename capitalization consistent.
-
-### Test the contact form locally
-
-1. Copy `.env.example` to `.env.local` and set the real IONOS mailbox password locally.
-2. Run `npm run dev` and open the local website.
-3. Submit the contact form with valid details and confirm the inquiry arrives at `amin.j@blackheroes.de`.
-4. Verify that invalid input is rejected and that the form displays its success or error status.
-
-Do not use a real password in source control or paste it into a public issue or pull request. Email delivery should only be reported as verified after an actual delivery test.
 
 ## Special instructions for developers
 
@@ -152,6 +147,7 @@ Do not use a real password in source control or paste it into a public issue or 
 - [ ] Changes pushed to `main`.
 - [ ] Vercel deployment succeeds.
 - [ ] Live website checked, including browser console, Network tab, and mobile layout where relevant.
+- [ ] `https://www.blackheroes.de/sitemap.xml` and `https://www.blackheroes.de/robots.txt` return valid responses.
 
 ## Before launch and content notes
 

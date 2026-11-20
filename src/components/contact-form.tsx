@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { ArrowRight } from "lucide-react";
+import { assetPath } from "@/lib/asset-path";
 
 type ContactFormProps = {
   services: string[];
@@ -12,15 +13,20 @@ type SubmissionStatus = {
   message: string;
 } | null;
 
+const errorMessage =
+  "Ihre Nachricht konnte leider nicht gesendet werden. Bitte versuchen Sie es erneut oder kontaktieren Sie uns telefonisch.";
+
 export function ContactForm({ services }: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<SubmissionStatus>(null);
+  const submissionInProgress = useRef(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (isSubmitting) return;
+    if (submissionInProgress.current) return;
 
     const form = event.currentTarget;
+    submissionInProgress.current = true;
     setIsSubmitting(true);
     setStatus(null);
 
@@ -36,21 +42,13 @@ export function ContactForm({ services }: ContactFormProps) {
     };
 
     try {
-      const response = await fetch("/api/contact/", {
+      const response = await fetch(assetPath("/api/contact/"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const result: unknown = await response.json();
 
       if (!response.ok) {
-        const errorMessage =
-          typeof result === "object" &&
-          result !== null &&
-          "error" in result &&
-          typeof result.error === "string"
-            ? result.error
-            : "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.";
         setStatus({ type: "error", message: errorMessage });
         return;
       }
@@ -58,14 +56,13 @@ export function ContactForm({ services }: ContactFormProps) {
       form.reset();
       setStatus({
         type: "success",
-        message: "Vielen Dank für Ihre Nachricht. Wir melden uns schnellstmöglich bei Ihnen.",
+        message:
+          "Vielen Dank für Ihre Anfrage! Ihre Nachricht wurde erfolgreich übermittelt. Wir melden uns zeitnah bei Ihnen.",
       });
     } catch {
-      setStatus({
-        type: "error",
-        message: "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
-      });
+      setStatus({ type: "error", message: errorMessage });
     } finally {
+      submissionInProgress.current = false;
       setIsSubmitting(false);
     }
   }
@@ -78,7 +75,7 @@ export function ContactForm({ services }: ContactFormProps) {
         <label className="text-sm font-bold">Name<input required name="name" autoComplete="name" maxLength={120} className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
         <label className="text-sm font-bold">Unternehmen<input name="company" autoComplete="organization" maxLength={160} className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
         <label className="text-sm font-bold">E-Mail<input required type="email" name="email" autoComplete="email" maxLength={254} className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
-        <label className="text-sm font-bold">Telefon<input name="phone" type="tel" autoComplete="tel" maxLength={40} className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
+        <label className="text-sm font-bold">Telefon<input name="phone" type="tel" autoComplete="tel" maxLength={40} pattern="(?:\+|00)?[0-9][0-9\s\(\)\.\/\-]*" title="Geben Sie eine gültige Telefonnummer ein." className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
       </div>
       <label className="mt-5 block text-sm font-bold">Worum geht es?<select required name="service" className="mt-2 w-full border border-[var(--line)] bg-white p-3 font-normal"><option value="">Bitte auswählen</option>{services.map(service => <option key={service} value={service}>{service}</option>)}</select></label>
       <label className="mt-5 block text-sm font-bold">Nachricht<textarea required name="message" rows={5} maxLength={5000} className="mt-2 w-full border border-[var(--line)] p-3 font-normal outline-none focus:border-[#c6a052]" /></label>
@@ -90,12 +87,13 @@ export function ContactForm({ services }: ContactFormProps) {
         <p
           className={`mt-4 text-sm ${status.type === "success" ? "text-green-800" : "text-red-700"}`}
           role={status.type === "success" ? "status" : "alert"}
+          aria-live={status.type === "success" ? "polite" : "assertive"}
         >
           {status.message}
         </p>
       )}
       <button className="btn btn-gold mt-6 w-full disabled:cursor-not-allowed disabled:opacity-70" type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Wird gesendet..." : "Nachricht senden"}
+        {isSubmitting ? "Nachricht wird gesendet ..." : "Nachricht senden"}
         {!isSubmitting && <ArrowRight size={17} />}
       </button>
     </form>
