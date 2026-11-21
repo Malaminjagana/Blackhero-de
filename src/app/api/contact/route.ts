@@ -56,6 +56,57 @@ function isValidEmail(value: string): boolean {
   );
 }
 
+function getSmtpErrorDetails(error: unknown) {
+  const smtpError = isRecord(error) ? error : {};
+  const rawCommand = typeof smtpError.command === "string" ? smtpError.command : "";
+  const command = [
+    "MAIL FROM",
+    "RCPT TO",
+    "STARTTLS",
+    "AUTH",
+    "CONNECT",
+    "EHLO",
+    "DATA",
+    "QUIT",
+  ].find((candidate) => rawCommand.trimStart().toUpperCase().startsWith(candidate));
+  const code = typeof smtpError.code === "string" ? smtpError.code : undefined;
+  const responseCode =
+    typeof smtpError.responseCode === "number" ? smtpError.responseCode : undefined;
+
+  let category = "smtp";
+  if (code === "EAUTH") {
+    category = "authentication";
+  } else if (code === "ETIMEDOUT") {
+    category = "timeout";
+  } else if (
+    command === "STARTTLS" ||
+    (code && /TLS|SSL|CERT|EPROTO/i.test(code))
+  ) {
+    category = "tls";
+  } else if (responseCode && command === "MAIL FROM") {
+    category = "sender-rejected";
+  } else if (responseCode && command === "RCPT TO") {
+    category = "recipient-rejected";
+  } else if (
+    code &&
+    /^(ECONNECTION|ECONNREFUSED|EHOSTUNREACH|ENETUNREACH|ENOTFOUND|ESOCKET)$/.test(code)
+  ) {
+    category = "connection";
+  }
+
+  return {
+    category,
+    code,
+    responseCode,
+    command,
+    errno:
+      typeof smtpError.errno === "number" || typeof smtpError.errno === "string"
+        ? smtpError.errno
+        : undefined,
+    syscall: typeof smtpError.syscall === "string" ? smtpError.syscall : undefined,
+  };
+}
+
 function isValidPhone(value: string): boolean {
   if (!value) return true;
   const digitCount = value.replace(/\D/g, "").length;
@@ -147,49 +198,65 @@ export async function POST(request: Request) {
     );
   }
 
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT);
-  const secureValue = process.env.SMTP_SECURE;
-  const user = process.env.SMTP_USER;
+  const host = process.env.SMTP_HOST?.trim().toLowerCase();
+  const rawPort = process.env.SMTP_PORT?.trim();
+  const port = rawPort ? Number(rawPort) : Number.NaN;
+  const secureValue = process.env.SMTP_SECURE?.trim();
+  const user = process.env.SMTP_USER?.trim();
   const password = process.env.SMTP_PASSWORD;
 
   const missingConfiguration = [
     !host && "SMTP_HOST",
-    (!Number.isInteger(port) || port < 1 || port > 65535) && "SMTP_PORT",
+    (!rawPort || !Number.isInteger(port)) && "SMTP_PORT",
     (secureValue !== "true" && secureValue !== "false") && "SMTP_SECURE",
     (!user || !isValidEmail(user)) && "SMTP_USER",
-    !password && "SMTP_PASSWORD",
+    (!password || !password.trim()) && "SMTP_PASSWORD",
+  ].filter((variable): variable is string => Boolean(variable));
+  const invalidConfiguration = [
+    (host && host !== "smtp.ionos.de") && "SMTP_HOST",
+    (Number.isInteger(port) && port !== 465 && port !== 587) && "SMTP_PORT",
+    (
+      (port === 465 && secureValue !== "true") ||
+      (port === 587 && secureValue !== "false")
+    ) && "SMTP_SECURE",
   ].filter((variable): variable is string => Boolean(variable));
 
   if (
     missingConfiguration.length > 0 ||
+    invalidConfiguration.length > 0 ||
     !host ||
-    !Number.isInteger(port) ||
-    port < 1 ||
-    port > 65535 ||
+    host !== "smtp.ionos.de" ||
+    (port !== 465 && port !== 587) ||
     (secureValue !== "true" && secureValue !== "false") ||
+    (port === 465 && secureValue !== "true") ||
+    (port === 587 && secureValue !== "false") ||
     !user ||
     !isValidEmail(user) ||
     !password
   ) {
     console.error("Contact form SMTP configuration is incomplete or invalid.", {
       missingVariables: missingConfiguration,
+      invalidVariables: [...new Set(invalidConfiguration)],
     });
     return NextResponse.json({ error: deliveryErrorMessage }, { status: 503 });
   }
 
   const secure = secureValue === "true";
+  let stage: "verify" | "send" = "verify";
   try {
     const transporter = nodemailer.createTransport({
       host,
       port,
       secure,
-      requireTLS: !secure,
+      requireTLS: port === 587,
       connectionTimeout: 10_000,
       greetingTimeout: 10_000,
       socketTimeout: 20_000,
       auth: { user, pass: password },
     });
+
+    await transporter.verify();
+    stage = "send";
 
     const info = await transporter.sendMail({
       from: { name: "Black Heroes", address: user },
@@ -221,10 +288,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: "Ihre Nachricht wurde erfolgreich gesendet." });
   } catch (error) {
-    const smtpError = isRecord(error) ? error : {};
-    console.error("Contact form email delivery failed.", {
-      code: typeof smtpError.code === "string" ? smtpError.code : undefined,
-      responseCode: typeof smtpError.responseCode === "number" ? smtpError.responseCode : undefined,
+    console.error("Contact form SMTP operation failed.", {
+      stage,
+      ...getSmtpErrorDetails(error),
     });
     return NextResponse.json({ error: deliveryErrorMessage }, { status: 502 });
   }
