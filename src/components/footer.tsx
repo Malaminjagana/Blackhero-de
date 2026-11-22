@@ -25,7 +25,7 @@ export function Footer() {
         <div>
           <h3 className="font-extrabold">Kontakt</h3>
           <div className="mt-5 flex flex-col gap-4 text-sm text-white/65">
-            <a href="tel:+491776105240" className="flex items-center gap-3"><Phone size={16} /> +49 177 6105240</a>
+            <a href="tel:+491776105240" className="flex items-center gap-3"><Phone size={16} /> +49 177 6105240 / +49 15563080115</a>
             <a href="https://blackheroes.de" className="flex items-center gap-3"><Globe size={16} /> blackheroes.de <ArrowUpRight size={13} /></a>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_NAME, SOCIAL_IMAGE } from "@/lib/site";
+import { SITE_NAME } from "@/lib/site";
 
 const description =
   "Datenschutzerklärung von Black Heroes Security: Informationen zur Verarbeitung personenbezogener Daten und Ihren Rechten.";
@@ -16,14 +16,12 @@ export const metadata: Metadata = {
     url: "/datenschutz/",
     siteName: SITE_NAME,
     locale: "de_DE",
-    type: "website",
-    images: [SOCIAL_IMAGE]
+    type: "website"
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: `Datenschutzerklärung | ${SITE_NAME}`,
-    description,
-    images: [SOCIAL_IMAGE]
+    description
   }
 };
 
@@ -91,10 +89,10 @@ export default function DatenschutzPage() {
             <p>
               Beim Aufruf einer Website können durch den Hostingbetrieb technische Zugriffsdaten verarbeitet
               werden, soweit sie für die Auslieferung, Stabilität und Sicherheit der Website erforderlich sind.
-              Die produktive Website wird über Vercel bereitgestellt. Der Hostingbetrieb kann technische
-              Zugriffsdaten verarbeiten, soweit diese für Auslieferung, Stabilität und Sicherheit erforderlich
-              sind. Welche konkreten Daten dabei erfasst werden und wie lange sie gespeichert bleiben, ist
-              anhand der tatsächlichen Projekteinstellungen und der Angaben des Hostinganbieters zu prüfen.
+              Das Projekt ist für eine statische Veröffentlichung über GitHub Pages konfiguriert. Ob und in
+              welchem Umfang GitHub Pages für die produktive Website eingesetzt wird, welche Zugriffsdaten
+              dabei konkret erfasst werden und wie lange sie gespeichert bleiben, muss anhand der tatsächlichen
+              Hosting-Konfiguration und der Angaben des Anbieters bestätigt werden.
             </p>
             <p>
               Soweit eine Verarbeitung zur sicheren Bereitstellung der Website erforderlich ist, erfolgt sie auf
@@ -118,17 +116,11 @@ export default function DatenschutzPage() {
             </p>
             <p>
               Wenn Sie das Anfrageformular absenden, werden die von Ihnen eingegebenen Angaben zur Bearbeitung
-              Ihrer Anfrage über unseren Webserver verarbeitet und per E-Mail an amin.j@blackheroes.de und
-              support@blackheroessecurity.de übermittelt. Für den E-Mail-Versand wird der SMTP-Dienst von IONOS
-              verwendet. Die Angaben werden
+              Ihrer Anfrage über unseren Webserver verarbeitet und per E-Mail an amin.j@blackheroes.de
+              übermittelt. Für den E-Mail-Versand wird der SMTP-Dienst von IONOS verwendet. Die Angaben werden
               nicht in einer Website-Datenbank gespeichert; die E-Mail wird in unserem Postfach so lange
               aufbewahrt, wie dies für die Bearbeitung erforderlich ist oder gesetzliche Pflichten beziehungsweise
               die Geltendmachung oder Abwehr von Ansprüchen eine weitere Speicherung erfordern.
-            </p>
-            <p>
-              Zur Begrenzung automatisierter Kontaktanfragen wird die IP-Adresse einer gültigen Anfrage
-              vorübergehend im Arbeitsspeicher der Serverfunktion verarbeitet. Der zugehörige Eintrag läuft
-              nach 15 Minuten ab und wird nicht in einer Website-Datenbank gespeichert.
             </p>
             <p>
               Wir bewahren Anfragen nur so lange auf, wie dies für deren Bearbeitung erforderlich ist oder
@@ -217,9 +209,9 @@ export default function DatenschutzPage() {
               schließen wir – soweit erforderlich – einen Vertrag zur Auftragsverarbeitung gemäß Art. 28 DSGVO.
             </p>
             <p>
-              Für den Hostingbetrieb wird Vercel eingesetzt. Ob und welche Vereinbarungen zur
-              Auftragsverarbeitung für den konkreten Betrieb erforderlich sind, ist anhand der tatsächlichen
-              Projekteinstellungen und der Anbieterbedingungen zu prüfen.
+              Die Projektkonfiguration sieht eine Veröffentlichung über GitHub Pages vor. Ob dieser Dienst die
+              produktive Website hostet und welche datenschutzrechtlichen Vereinbarungen für den tatsächlichen
+              Betrieb gelten, ist anhand der eingesetzten Hosting-Konfiguration zu bestätigen.
             </p>
           </div>
         </section>

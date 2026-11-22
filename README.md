@@ -64,28 +64,26 @@ If you are working on a branch other than `main`, do not push it as `main`; inte
 
 ## Environment Variables and Configuration
 
-The contact form sends email through the server-side `/api/contact` route using Nodemailer and the existing IONOS SMTP mailbox. The site itself can run and build without SMTP credentials, but contact form delivery returns a service-unavailable error until all five SMTP variables are configured. Each message is sent in one SMTP submission to `amin.j@blackheroes.de` and `support@blackheroessecurity.de`; the visitor's validated address is used only as `Reply-To`.
+The contact form sends email through the server-side `/api/contact` route using Resend. The site itself can run and build without Resend credentials, but contact form delivery returns a service-unavailable error until the Resend variables are configured. Each inquiry is sent in one email request to both `amin.j@blackheroes.de` and `support@blackheroessecurity.de`; the visitor's validated address is used only as `Reply-To`. A successful API response means Resend accepted the message; it does not independently confirm inbox delivery.
 
-Copy [`.env.example`](./.env.example) to `.env.local` for local development, then fill in the values from the SMTP provider:
+Copy [`.env.example`](./.env.example) to `.env.local` for local development, then fill in the values from Resend and the verified sending domain:
 
 ```bash
 cp .env.example .env.local
 ```
 
-`.env.local` is for machine-specific credentials and is excluded from Git. `.env.example` is committed so developers can see which settings the application expects; it contains blank placeholders only and must never contain real credentials. Do not commit `.env.local`, share mailbox passwords, or expose SMTP values through `NEXT_PUBLIC_` variables.
+`.env.local` is for machine-specific credentials and is excluded from Git. `.env.example` is committed so developers can see which settings the application expects; it contains placeholders only and must never contain real credentials. Do not commit `.env.local` or expose the Resend API key through a `NEXT_PUBLIC_` variable.
 
 | Variable | Purpose | Required? | Where to obtain it | Local / production |
 | --- | --- | --- | --- | --- |
-| `SMTP_HOST` | SMTP server used by Nodemailer | Required for contact email | Mail provider's SMTP settings (currently intended for IONOS) | Set in `.env.local` and Vercel |
-| `SMTP_PORT` | SMTP server port | Required for contact email | Mail provider's SMTP settings | Set in `.env.local` and Vercel |
-| `SMTP_SECURE` | Whether SMTP uses implicit TLS (`true` or `false`) | Required for contact email | Match the provider's connection settings | Set in `.env.local` and Vercel |
-| `SMTP_USER` | Authenticated SMTP mailbox address; also used as the sender | Required; must be an address the SMTP provider permits for sending | Mailbox account details from the provider | Set in `.env.local` and Vercel |
-| `SMTP_PASSWORD` | SMTP mailbox password | Required for contact email | Mailbox account credentials from the provider | Set in `.env.local` and Vercel |
+| `RESEND_API_KEY` | Server-side Resend API credential | Required for contact email | Resend API keys | Set in `.env.local` and Vercel; never expose publicly |
+| `CONTACT_FROM_EMAIL` | Sender address on the authenticated Resend domain | Required; must be a valid, verified sender address | Your verified sending domain in Resend | Set in `.env.local` and Vercel |
+| `CONTACT_EMAIL_TO` | Comma-separated recipient addresses; must include both Black Heroes inboxes | Required | `amin.j@blackheroes.de,support@blackheroessecurity.de` | Set in `.env.local` and Vercel |
 | `NEXT_PUBLIC_BASE_PATH` | URL prefix for deployments hosted below a path | Optional; leave empty for a root-domain deployment | Your deployment's URL path, if applicable | Local or production only when using a subpath; this is public configuration, not a secret |
 
-For Vercel, add the five SMTP variables in **Project → Settings → Environment Variables** for each environment where the form should send mail (Development, Preview, and/or Production). For IONOS, use `SMTP_HOST=smtp.ionos.de` and either `SMTP_PORT=465` with `SMTP_SECURE=true` (SSL/TLS) or `SMTP_PORT=587` with `SMTP_SECURE=false` (STARTTLS). `SMTP_USER` must be the full mailbox address and `SMTP_PASSWORD` its mailbox password. Keep them server-side. `NEXT_PUBLIC_BASE_PATH` is normally unnecessary on Vercel and should only be set for a subpath deployment.
+For Vercel, add the three Resend variables in **Project → Settings → Environment Variables** for each environment where the form should send mail (Development, Preview, and/or Production). Keep `RESEND_API_KEY` server-side. `NEXT_PUBLIC_BASE_PATH` is normally unnecessary on Vercel and should only be set for a subpath deployment.
 
-The SMTP credentials are read only by the server route. The visitor never controls the sender address; `SMTP_USER` is used as the authenticated sender and the validated visitor address is set as `Reply-To`. Ensure that the mailbox and sending domain are authorized by the mail provider and that its recommended SPF/DKIM DNS records are configured. The current handler applies an in-memory limit of five valid submissions per IP per 15 minutes; because Vercel may run multiple function instances, configure a Vercel Firewall rate-limit rule for a distributed production limit.
+The Resend credentials are read only by the server route. The visitor never controls the sender or recipients, and the validated visitor address is set as `Reply-To`. Ensure the sender's domain is verified in Resend and its required DNS records are configured. The current handler applies an in-memory limit of five valid submissions per IP per 15 minutes; because Vercel may run multiple function instances, configure a Vercel Firewall rate-limit rule for a distributed production limit. Existing SMTP variables are no longer read by the application; keep them in Vercel until the Resend integration has been verified in production, then they can be removed.
 
 The `/api/contact` route requires the standard Next.js server runtime, so the application cannot use a static-only host for email delivery. Vercel supports the required route. Always use `assetPath()` for public assets.
 
@@ -95,7 +93,7 @@ The homepage and legal pages use the Next.js Metadata API for unique titles, des
 
 ### Test the contact form locally
 
-1. Copy `.env.example` to `.env.local` and fill in all five SMTP values using the provider's settings.
+1. Copy `.env.example` to `.env.local` and fill in the Resend API key, verified sender, and both recipient addresses.
 2. Run `npm run dev` and open the local website.
 3. Submit a valid inquiry and confirm that it arrives at both `amin.j@blackheroes.de` and `support@blackheroessecurity.de`.
 4. Verify that invalid fields and a filled honeypot are rejected, and that SMTP configuration or delivery errors produce the generic form error without clearing the entered values.

@@ -61,7 +61,7 @@ const structuredData = {
       name: SITE_NAME,
       url: `${SITE_URL}/`,
       logo: `${SITE_URL}/images/black-heroes-logo-transparent.webp`,
-      telephone: "+49 177 6105240",
+      telephone: "+49 177 6105240 / +49 15563080115",
       email: "support@blackheroessecurity.de",
       areaServed: [
         { "@type": "City", name: "Berlin" },
@@ -69,7 +69,7 @@ const structuredData = {
       ],
       contactPoint: {
         "@type": "ContactPoint",
-        telephone: "+49 177 6105240",
+        telephone: "+49 177 6105240/+49 15563080115",
         email: "support@blackheroessecurity.de",
         contactType: "customer service",
         availableLanguage: "German"
@@ -508,7 +508,7 @@ export default function HomePage() {
             <h2 className="section-title">Lassen Sie uns über Ihre Sicherheit sprechen.</h2>
             <p className="section-copy">Sie möchten ein Angebot anfragen oder haben Fragen zu unseren Leistungen? Wir freuen uns auf Ihre Nachricht.</p>
             <div className="mt-9 space-y-5">
-              <a className="flex items-center gap-4 font-bold" href="tel:+491776105240"><span className="flex h-11 w-11 items-center justify-center bg-white text-[#96702f]"><Phone size={19} /></span> +49 177 6105240</a>
+              <a className="flex items-center gap-4 font-bold" href="tel:+491776105240"><span className="flex h-11 w-11 items-center justify-center bg-white text-[#96702f]"><Phone size={19} /></span> +49 177 6105240 / +49 15563080115</a>
               <div className="flex items-center gap-4 font-bold"><span className="flex h-11 w-11 items-center justify-center bg-white text-[#96702f]"><MapPin size={19} /></span> Berlin und deutschlandweit</div>
               <div className="flex items-center gap-4 font-bold"><span className="flex h-11 w-11 items-center justify-center bg-white text-[#96702f]"><Clock3 size={19} /></span> Anfragen nach Vereinbarung</div>
             </div>

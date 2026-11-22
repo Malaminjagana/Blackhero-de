@@ -138,7 +138,7 @@ export function Hero3D() {
             </div>
             <div className="inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[.2em] text-[#dfc58e]">
               <span className="h-px w-10 bg-[#c6a052]" />
-              Black Heroes Security · Berlin und deutschlandweit
+              Black Heroes Security GmbH · Berlin und deutschlandweit
             </div>
           </div>
           <h1
