@@ -4,6 +4,7 @@ import { Resend } from "resend";
 export const runtime = "nodejs";
 
 const requiredRecipients = ["amin.j@blackheroes.de", "support@blackheroessecurity.de"];
+const verifiedSenderDomain = "mail.blackheroes.de";
 const invalidInputMessage = "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.";
 const deliveryErrorMessage =
   "Ihre Nachricht konnte leider nicht gesendet werden. Bitte versuchen Sie es erneut oder kontaktieren Sie uns telefonisch.";
@@ -54,6 +55,58 @@ function isValidEmail(value: string): boolean {
     !localPart.includes("..") &&
     emailPattern.test(value)
   );
+}
+
+function getSender(value: string | undefined): string | null {
+  if (!value) return null;
+
+  const sender = value.trim();
+  if (!sender || hasControlCharacters(sender)) return null;
+
+  const formattedSender = /^(.*?)\s*<([^<>]+)>$/.exec(sender);
+  const displayName = formattedSender?.[1].trim();
+  const address = (formattedSender?.[2] ?? sender).trim();
+
+  if (
+    (!formattedSender && /[<>]/.test(sender)) ||
+    (formattedSender && (!displayName || /[<>]/.test(displayName))) ||
+    !isValidEmail(address) ||
+    address.slice(address.lastIndexOf("@") + 1).toLowerCase() !== verifiedSenderDomain
+  ) {
+    return null;
+  }
+
+  return formattedSender ? `${displayName} <${address}>` : address;
+}
+
+function redactDiagnostic(value: string, privateValues: string[]): string {
+  let sanitized = value.replace(/[\u0000-\u001f\u007f]/g, " ").trim();
+  for (const privateValue of privateValues) {
+    if (privateValue) sanitized = sanitized.replaceAll(privateValue, "[redacted]");
+  }
+  return sanitized
+    .replace(/[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted-email]")
+    .slice(0, 500);
+}
+
+function getResendErrorDetails(error: unknown, privateValues: string[]) {
+  const details = isRecord(error) ? error : {};
+  const errorName =
+    typeof details.name === "string"
+      ? redactDiagnostic(details.name, privateValues)
+      : undefined;
+  const errorMessage =
+    typeof details.message === "string"
+      ? redactDiagnostic(details.message, privateValues)
+      : undefined;
+  const httpStatus =
+    typeof details.statusCode === "number"
+      ? details.statusCode
+      : typeof details.status === "number"
+        ? details.status
+        : undefined;
+
+  return { errorName, errorMessage, httpStatus };
 }
 
 function isValidPhone(value: string): boolean {
@@ -165,20 +218,38 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.CONTACT_FROM_EMAIL?.trim();
+  const from = getSender(process.env.CONTACT_FROM_EMAIL);
   const recipients = getRecipients(process.env.CONTACT_EMAIL_TO);
-  const missingConfiguration = [
+  const missingVariables = [
     !apiKey && "RESEND_API_KEY",
-    !from && "CONTACT_FROM_EMAIL",
-    !recipients && "CONTACT_EMAIL_TO",
+    !process.env.CONTACT_FROM_EMAIL?.trim() && "CONTACT_FROM_EMAIL",
+    !process.env.CONTACT_EMAIL_TO?.trim() && "CONTACT_EMAIL_TO",
+  ].filter((variable): variable is string => Boolean(variable));
+  const invalidVariables = [
+    process.env.CONTACT_FROM_EMAIL?.trim() && !from && "CONTACT_FROM_EMAIL",
+    process.env.CONTACT_EMAIL_TO?.trim() && !recipients && "CONTACT_EMAIL_TO",
   ].filter((variable): variable is string => Boolean(variable));
 
-  if (!apiKey || !from || !isValidEmail(from) || !recipients) {
+  if (!apiKey || !from || !recipients) {
     console.error("Contact form Resend configuration is incomplete or invalid.", {
-      missingVariables: missingConfiguration,
+      event: "contact_email_failure",
+      category: "configuration",
+      missingVariables,
+      invalidVariables,
     });
     return NextResponse.json({ error: deliveryErrorMessage }, { status: 503 });
   }
+
+  const privateValues = [
+    apiKey,
+    name,
+    company,
+    email,
+    phone,
+    message,
+    from,
+    ...recipients,
+  ];
 
   try {
     const resend = new Resend(apiKey);
@@ -201,14 +272,35 @@ export async function POST(request: Request) {
       ].join("\n"),
     });
 
-    if (error || !data?.id) {
-      console.error("Resend did not accept the contact form message.");
+    if (error) {
+      console.error("Contact form email delivery failed.", {
+        event: "contact_email_failure",
+        category: "resend_api_error",
+        ...getResendErrorDetails(error, privateValues),
+      });
       return NextResponse.json({ error: deliveryErrorMessage }, { status: 502 });
     }
 
+    if (!data?.id) {
+      console.error("Contact form email delivery failed.", {
+        event: "contact_email_failure",
+        category: "resend_response_without_message_id",
+      });
+      return NextResponse.json({ error: deliveryErrorMessage }, { status: 502 });
+    }
+
+    console.info("Contact form email accepted by Resend.", {
+      event: "contact_email_accepted",
+      category: "accepted",
+      resendMessageId: data.id,
+    });
     return NextResponse.json({ message: "Ihre Nachricht wurde erfolgreich gesendet." });
-  } catch {
-    console.error("Contact form Resend request failed.");
+  } catch (error) {
+    console.error("Contact form email delivery failed.", {
+      event: "contact_email_failure",
+      category: "resend_exception",
+      ...getResendErrorDetails(error, privateValues),
+    });
     return NextResponse.json({ error: deliveryErrorMessage }, { status: 502 });
   }
 }
