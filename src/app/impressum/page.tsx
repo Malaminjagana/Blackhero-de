@@ -37,7 +37,7 @@ export default function ImpressumPage() {
           <h2 className="font-extrabold text-[#202020]">Angaben gemäß § 5 DDG</h2>
           <p className="mt-2">
             Black Heroes Security GmbH<br />
-            Hauptstraße 117<br />
+            Ebersstr. 61<br />
             10827 Berlin
           </p>
         </section>

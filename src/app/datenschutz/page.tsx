@@ -48,7 +48,7 @@ export default function DatenschutzPage() {
               <br />
               Black Heroes Security GmbH
               <br />
-              Hauptstraße 117
+              Ebersstr. 61
               <br />
               10827 Berlin
             </p>
