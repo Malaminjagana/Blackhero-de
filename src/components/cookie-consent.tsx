@@ -12,10 +12,18 @@ import {
   useState
 } from "react";
 import { Cookie, LockKeyhole, Settings2, ShieldCheck, X } from "lucide-react";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { assetPath } from "@/lib/asset-path";
 
 const CONSENT_STORAGE_KEY = "black-heroes-cookie-consent";
 const CONSENT_VERSION = 1;
+const GTM_CONTAINER_ID = "GTM-WSCD2KW9";
+const deniedGoogleConsent: GoogleConsentState = {
+  analytics_storage: "denied",
+  ad_storage: "denied",
+  ad_user_data: "denied",
+  ad_personalization: "denied"
+};
 
 export type CookiePreferences = {
   necessary: true;
@@ -26,6 +34,12 @@ export type CookiePreferences = {
 
 type StoredConsent = CookiePreferences & { version: number };
 type OptionalPreferences = Pick<CookiePreferences, "statistics" | "marketing">;
+type GoogleConsentState = {
+  analytics_storage: "granted" | "denied";
+  ad_storage: "granted" | "denied";
+  ad_user_data: "granted" | "denied";
+  ad_personalization: "granted" | "denied";
+};
 
 type CookieConsentContextValue = {
   preferences: CookiePreferences | null;
@@ -69,6 +83,27 @@ function readStoredConsent(): CookiePreferences | null {
   }
 }
 
+function pushGoogleConsent(selection: OptionalPreferences, initialize = false) {
+  const dataLayer = window.dataLayer = window.dataLayer || [];
+  const gtag: (command: string, action: "default" | "update", consent: GoogleConsentState) => void =
+    function () {
+      // Google Consent Mode uses the arguments object as its dataLayer command.
+      // eslint-disable-next-line prefer-rest-params
+      dataLayer.push(arguments);
+    };
+
+  if (initialize) {
+    gtag("consent", "default", deniedGoogleConsent);
+  }
+
+  gtag("consent", "update", {
+    analytics_storage: selection.statistics ? "granted" : "denied",
+    ad_storage: selection.marketing ? "granted" : "denied",
+    ad_user_data: selection.marketing ? "granted" : "denied",
+    ad_personalization: selection.marketing ? "granted" : "denied"
+  });
+}
+
 export function useCookieConsent() {
   const context = useContext(CookieConsentContext);
   if (!context) {
@@ -91,6 +126,14 @@ export function CookieSettingsLink() {
   );
 }
 
+export function ConsentAwareGoogleTagManager() {
+  const { preferences } = useCookieConsent();
+
+  if (!preferences || (!preferences.statistics && !preferences.marketing)) return null;
+
+  return <GoogleTagManager gtmId={GTM_CONTAINER_ID} />;
+}
+
 export function CookieConsentProvider({ children }: { children: ReactNode }) {
   const [preferences, setPreferences] = useState<CookiePreferences | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -98,9 +141,14 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [draft, setDraft] = useState<OptionalPreferences>({ statistics: false, marketing: false });
   const [saveError, setSaveError] = useState("");
+  const googleConsentInitialized = useRef(false);
 
   useEffect(() => {
     const storedConsent = readStoredConsent();
+    if (!googleConsentInitialized.current) {
+      pushGoogleConsent(storedConsent ?? { statistics: false, marketing: false }, true);
+      googleConsentInitialized.current = true;
+    }
     setPreferences(storedConsent);
     setBannerOpen(storedConsent === null);
     setHasLoaded(true);
@@ -131,6 +179,9 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
       setSaveError("Ihre Auswahl konnte nicht gespeichert werden. Bitte prüfen Sie die Speichereinstellungen Ihres Browsers und versuchen Sie es erneut.");
       return;
     }
+
+    pushGoogleConsent(selection, !googleConsentInitialized.current);
+    googleConsentInitialized.current = true;
 
     setPreferences({
       necessary: true,
@@ -200,13 +251,13 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
                 </h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-white/70">
                   Wir verwenden Cookies und ähnliche Technologien, um die technische Funktionsfähigkeit unserer
-                  Website sicherzustellen und sofern Sie zustimmen die Nutzung unseres Online-Angebots zu
-                  analysieren und kontinuierlich zu verbessern. Sie entscheiden selbst, welche optionalen Cookies
-                  Sie zulassen möchten. Ihre Auswahl können Sie jederzeit ändern.
+                  Website sicherzustellen. Google Tag Manager wird erst geladen, wenn Sie mindestens eine optionale
+                  Kategorie zulassen. Sie entscheiden selbst, welche optionalen Dienste Sie freigeben möchten; Ihre
+                  Auswahl können Sie jederzeit ändern.
                 </p>
                 <p className="mt-3 flex items-center gap-2 text-xs font-semibold text-white/55">
                   <LockKeyhole size={14} className="text-[#dfc58e]" aria-hidden="true" />
-                  Notwendige Technologien sind immer aktiv; optionale Dienste sind derzeit nicht eingebunden.
+                  Notwendige Technologien sind immer aktiv; ohne optionale Einwilligung bleibt GTM deaktiviert.
                 </p>
                 {saveError && (
                   <p role="alert" className="mt-3 border border-red-300 bg-red-950/60 px-3 py-2 text-xs leading-5 text-red-100">
@@ -335,13 +386,13 @@ function PreferencesDialog({
           />
           <PreferenceOption
             title="Statistik und Analyse"
-            description="Optional. Für zukünftige Reichweitenmessung und Analyse vorgesehen. Derzeit ist kein Analysedienst eingebunden."
+            description="Optional. Analyse-Tags im Google Tag Manager dürfen nur mit Ihrer Zustimmung zu dieser Kategorie messen."
             checked={draft.statistics}
             onChange={(checked) => onChange({ ...draft, statistics: checked })}
           />
           <PreferenceOption
             title="Marketing und externe Dienste"
-            description="Optional. Für zukünftige Marketing- und externe Tracking-Dienste vorgesehen. Derzeit sind solche Dienste nicht eingebunden."
+            description="Optional. Marketing-Tags im Google Tag Manager dürfen nur mit Ihrer Zustimmung zu dieser Kategorie aktiv werden."
             checked={draft.marketing}
             onChange={(checked) => onChange({ ...draft, marketing: checked })}
           />

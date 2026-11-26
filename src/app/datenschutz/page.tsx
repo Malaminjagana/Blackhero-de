@@ -164,17 +164,19 @@ export default function DatenschutzPage() {
             </p>
             <p>
               Statistik und Analyse sowie Marketing und externe Dienste sind optionale Kategorien und standardmäßig
-              deaktiviert. Derzeit sind auf dieser Website keine Analyse-, Werbe- oder externen Tracking-Dienste
-              eingebunden; die optionalen Kategorien lösen daher keine solchen Dienste aus. Eine Auswahl für eine
-              optionale Kategorie aktiviert keine noch nicht eingebundenen Dienste.
+              deaktiviert. Google Tag Manager (GTM) dient der Verwaltung optionaler Tags und wird erst geladen,
+              wenn Sie mindestens eine dieser Kategorien aktivieren. Vor dem Laden werden die Google-Consent-Mode-
+              Signale entsprechend Ihrer Auswahl gesetzt. Analyse-Tags müssen im GTM-Container an Ihre Zustimmung
+              zu Statistik und Analyse, Marketing-Tags an Ihre Zustimmung zu Marketing und externen Diensten
+              gebunden sein. Welche Anbieter und Tags im Container aktiv sind, hängt von dessen jeweiliger
+              Konfiguration ab.
             </p>
             <p>
               Sie können Ihre Auswahl jederzeit ändern oder eine zuvor erteilte Einwilligung widerrufen, indem Sie
               den Link „Cookie-Einstellungen“ im Footer öffnen und die Einstellungen speichern. Eine erteilte
-              Einwilligung kann mit Wirkung für die Zukunft widerrufen werden. Soweit künftig optionale
-              Technologien eingesetzt werden, erfolgt ein Zugriff auf Informationen in Ihrem Endgerät nur mit
-              Ihrer vorherigen Einwilligung gemäß § 25 Abs. 1 TDDDG; die Verarbeitung personenbezogener Daten
-              beruht dann auf Art. 6 Abs. 1 lit. a DSGVO.
+              Einwilligung kann mit Wirkung für die Zukunft widerrufen werden. Ein Zugriff optionaler Tags auf
+              Informationen in Ihrem Endgerät erfolgt nur nach Ihrer vorherigen Einwilligung gemäß § 25 Abs. 1
+              TDDDG; die Verarbeitung personenbezogener Daten beruht dann auf Art. 6 Abs. 1 lit. a DSGVO.
             </p>
           </div>
         </section>

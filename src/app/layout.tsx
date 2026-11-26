@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { CookieConsentProvider } from "@/components/cookie-consent";
+import { ConsentAwareGoogleTagManager, CookieConsentProvider } from "@/components/cookie-consent";
 import { assetPath } from "@/lib/asset-path";
 import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL, SOCIAL_IMAGE } from "@/lib/site";
 
@@ -57,6 +57,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="de">
       <body>
         <CookieConsentProvider>
+          <ConsentAwareGoogleTagManager />
           <Navbar />
           {children}
           <Footer />

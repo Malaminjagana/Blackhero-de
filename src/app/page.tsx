@@ -59,6 +59,7 @@ const structuredData = {
       "@type": "Organization",
       "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
+      description: "Professionelle Sicherheitsdienstleistungen in Berlin und deutschlandweit.",
       url: `${SITE_URL}/`,
       logo: `${SITE_URL}/images/black-heroes-logo-transparent.webp`,
       telephone: "+49 177 6105240 / +49 15563080115",
@@ -87,15 +88,19 @@ const structuredData = {
       "@type": "Service",
       "@id": `${SITE_URL}/#security-services`,
       name: "Sicherheitsdienstleistungen",
+      description: "Professionelle Sicherheitsdienstleistungen in Berlin und deutschlandweit.",
       serviceType: [
         "Objektschutz",
         "Veranstaltungsschutz",
+        "Kampf- und Veranstaltungsschutz",
         "Baustellenbewachung",
         "Revierdienst",
         "Empfangs- und Pfortendienst",
+        "Individuelle Sicherheitslösungen",
         "Personenschutz",
         "Ausstellungsbewachung",
-        "Filmsetbewachung"
+        "Filmsetbewachung",
+        "Kaufhausdetektiv"
       ],
       provider: { "@id": `${SITE_URL}/#organization` },
       areaServed: [
